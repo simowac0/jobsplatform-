@@ -172,6 +172,19 @@
 
       <!-- ══ SIGN IN ══ -->
       <div id="signinBlock">
+        <div class="social-btns">
+          <button class="social-btn" onclick="socialLogin('google')">
+            <i class="fa-brands fa-google" style="color:#EA4335;"></i> Continue with Google
+          </button>
+          <button class="social-btn" onclick="socialLogin('linkedin_oidc')">
+            <i class="fa-brands fa-linkedin" style="color:#0A66C2;"></i> Continue with LinkedIn
+          </button>
+          <button class="social-btn" onclick="socialLogin('facebook')">
+            <i class="fa-brands fa-facebook" style="color:#1877F2;"></i> Continue with Facebook
+          </button>
+        </div>
+        <div class="divider">or sign in with email</div>
+
         <form onsubmit="handleLogin(event)">
           <div class="form-group">
             <label>Email</label>
@@ -199,6 +212,19 @@
 
       <!-- ══ REGISTER ══ -->
       <div id="registerBlock" style="display:none;">
+        <div class="social-btns">
+          <button class="social-btn" onclick="socialLogin('google')">
+            <i class="fa-brands fa-google" style="color:#EA4335;"></i> Continue with Google
+          </button>
+          <button class="social-btn" onclick="socialLogin('linkedin_oidc')">
+            <i class="fa-brands fa-linkedin" style="color:#0A66C2;"></i> Continue with LinkedIn
+          </button>
+          <button class="social-btn" onclick="socialLogin('facebook')">
+            <i class="fa-brands fa-facebook" style="color:#1877F2;"></i> Continue with Facebook
+          </button>
+        </div>
+        <div class="divider">or create account with email</div>
+
         <div class="form-row">
           <div class="form-group">
             <label>First name</label>
