@@ -543,7 +543,13 @@ function showApplyView() {
 }
 
 // ─── STEP LOGIC ──────────────────────────────────────────────
+function stopAllCams() {
+  if (window.idCamStream)     { idCamStream.getTracks().forEach(function(t){t.stop();}); idCamStream = null; }
+  if (window.selfieCamStream) { selfieCamStream.getTracks().forEach(function(t){t.stop();}); selfieCamStream = null; }
+}
+
 function applyGoStep(n) {
+  if (n !== 2) stopAllCams();
   for (var i=1; i<=3; i++) {
     document.getElementById('applyStep'+i).style.display = i===n ? 'block' : 'none';
     var circle = document.querySelector('#astep'+i+' .apply-step-circle');
@@ -602,8 +608,9 @@ function applyStep2() {
 function applyStep3() {
   var cvFile = document.getElementById('apCvFile').files[0];
   var idFile = document.getElementById('apIdFile').files[0];
+  var hasIdCam = !!window._idCapturedDataUrl;
   if (!cvFile) { showApplyMsg('applyMsg2','Please upload your CV.','error'); return; }
-  if (!idFile) { showApplyMsg('applyMsg2','Please upload your identity document.','error'); return; }
+  if (!idFile && !hasIdCam) { showApplyMsg('applyMsg2','Please provide your identity document.','error'); return; }
   showApplyMsg('applyMsg2','','');
 
   var rev = document.getElementById('reviewData');
@@ -633,7 +640,62 @@ function apPreviewCv() {
 function apSelectId(type) {
   document.getElementById('apIdNational').classList.toggle('active', type==='national');
   document.getElementById('apIdPassport').classList.toggle('active', type==='passport');
-  document.getElementById('apIdLabel').textContent = type==='passport' ? 'Passport' : 'National ID Card';
+  var lbl = document.getElementById('apIdLabel');
+  if (lbl) lbl.textContent = type==='passport' ? 'Passport' : 'National ID Card';
+}
+
+// ─── ID SOURCE TOGGLE ────────────────────────────────────────
+function idSetSource(src) {
+  document.getElementById('idSrcCamera').classList.toggle('active', src==='camera');
+  document.getElementById('idSrcUpload').classList.toggle('active', src==='upload');
+  document.getElementById('idCameraMode').style.display = src==='camera' ? 'block' : 'none';
+  document.getElementById('idUploadMode').style.display = src==='upload' ? 'block' : 'none';
+  if (src==='camera') idCamStart();
+}
+
+// ─── ID CAMERA ───────────────────────────────────────────────
+var idCamStream = null;
+
+async function idCamStart() {
+  var video = document.getElementById('idCamVideo');
+  var idle  = document.getElementById('idCamIdle');
+  try {
+    idCamStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 } } });
+    video.srcObject = idCamStream;
+    video.style.display = 'block';
+    if (idle) idle.style.display = 'none';
+    document.getElementById('idStartBtn').style.display   = 'none';
+    document.getElementById('idCaptureBtn').style.display = 'inline-flex';
+    document.getElementById('idRetryBtn').style.display   = 'none';
+    document.getElementById('idCamBtns').style.display    = 'flex';
+  } catch(e) {
+    if (idle) idle.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="font-size:28px;color:#f97316;margin-bottom:8px;"></i><span style="font-size:13px;color:#9ca3af;">Camera not available — use Upload</span>';
+    idSetSource('upload');
+  }
+}
+
+function idCamCapture() {
+  var video  = document.getElementById('idCamVideo');
+  var canvas = document.getElementById('idCamCanvas');
+  var img    = document.getElementById('idCapturedImg');
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  var dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+  img.src = dataUrl;
+  img.style.display = 'block';
+  video.style.display = 'none';
+  if (idCamStream) { idCamStream.getTracks().forEach(function(t){t.stop();}); idCamStream = null; }
+  document.getElementById('idCaptureBtn').style.display = 'none';
+  document.getElementById('idRetryBtn').style.display   = 'inline-flex';
+  window._idCapturedDataUrl = dataUrl;
+}
+
+function idCamRetry() {
+  document.getElementById('idCapturedImg').style.display = 'none';
+  window._idCapturedDataUrl = null;
+  document.getElementById('idRetryBtn').style.display   = 'none';
+  idCamStart();
 }
 
 function apPreviewId() {
@@ -644,16 +706,61 @@ function apPreviewId() {
   box.parentElement.classList.add('has-file');
 }
 
+// ─── SELFIE CAMERA ───────────────────────────────────────────
+var selfieCamStream = null;
+
+async function selfieCamInit() {
+  var video = document.getElementById('selfieCamVideo');
+  if (video.style.display === 'block') return;
+  var preview = document.getElementById('apSelfiePreview');
+  try {
+    selfieCamStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 720 } } });
+    video.srcObject = selfieCamStream;
+    video.style.display = 'block';
+    preview.style.display = 'none';
+    document.getElementById('selfieCaptureBtn').style.display = 'inline-flex';
+    document.getElementById('selfieRetryBtn').style.display   = 'none';
+  } catch(e) {
+    preview.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="font-size:32px;color:#f97316;margin-bottom:8px;"></i><span style="font-size:13px;color:#9ca3af;">Camera denied — use file upload</span>';
+    document.getElementById('apSelfie').click();
+  }
+}
+
+function selfieCamCapture() {
+  var video  = document.getElementById('selfieCamVideo');
+  var canvas = document.getElementById('selfieCamCanvas');
+  var img    = document.getElementById('selfieCapturedImg');
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  var dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+  img.src = dataUrl;
+  img.style.display = 'block';
+  video.style.display = 'none';
+  if (selfieCamStream) { selfieCamStream.getTracks().forEach(function(t){t.stop();}); selfieCamStream = null; }
+  document.getElementById('selfieCaptureBtn').style.display = 'none';
+  document.getElementById('selfieRetryBtn').style.display   = 'inline-flex';
+  window._selfieCapturedDataUrl = dataUrl;
+}
+
+function selfieCamRetry() {
+  document.getElementById('selfieCapturedImg').style.display = 'none';
+  window._selfieCapturedDataUrl = null;
+  document.getElementById('selfieRetryBtn').style.display = 'none';
+  selfieCamInit();
+}
+
 function apPreviewSelfie() {
   var file = document.getElementById('apSelfie').files[0];
   if (!file) return;
   var reader = new FileReader();
   reader.onload = function(e) {
-    var wrap = document.getElementById('apSelfiePreview').parentElement;
-    document.getElementById('apSelfiePreview').innerHTML =
-      '<img src="'+e.target.result+'" style="width:130px;height:160px;object-fit:cover;border-radius:50%;border:3px solid #63b3ed;" />' +
-      '<div style="font-size:12px;color:#63b3ed;font-weight:600;margin-top:8px;"><i class="fa-solid fa-circle-check"></i> '+file.name+'</div>';
-    wrap.style.background = '#0f0f1a';
+    window._selfieCapturedDataUrl = e.target.result;
+    document.getElementById('selfieCapturedImg').src = e.target.result;
+    document.getElementById('selfieCapturedImg').style.display = 'block';
+    document.getElementById('apSelfiePreview').style.display = 'none';
+    document.getElementById('selfieRetryBtn').style.display = 'inline-flex';
+    document.getElementById('selfieCaptureBtn').style.display = 'none';
   };
   reader.readAsDataURL(file);
 }
@@ -688,8 +795,8 @@ async function submitApply() {
   var selfieFile = document.getElementById('apSelfie').files[0];
 
   var cvData     = cvFile     ? await toBase64(cvFile)     : null;
-  var idData     = idFile     ? await toBase64(idFile)     : null;
-  var selfieData = selfieFile ? await toBase64(selfieFile) : null;
+  var idData     = idFile     ? await toBase64(idFile)     : (window._idCapturedDataUrl || null);
+  var selfieData = (window._selfieCapturedDataUrl) || (selfieFile ? await toBase64(selfieFile) : null);
 
   var formData = {
     firstName: fn, lastName: ln, email: em, phone: ph,

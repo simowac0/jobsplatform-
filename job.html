@@ -291,14 +291,43 @@
               </div>
 
               <!-- ID Type Toggle -->
-              <div class="id-type-toggle" style="margin:20px 0 16px;">
+              <div class="id-type-toggle" style="margin:20px 0 12px;">
                 <button class="id-btn active" id="apIdNational" onclick="apSelectId('national')"><i class="fa-solid fa-id-card"></i> National ID</button>
                 <button class="id-btn" id="apIdPassport" onclick="apSelectId('passport')"><i class="fa-solid fa-passport"></i> Passport</button>
               </div>
 
-              <!-- ID Frame -->
-              <div class="upload-group">
-                <label class="upload-label"><i class="fa-solid fa-id-card"></i> <span id="apIdLabel">National ID Card</span> <span class="upload-optional">Front side</span></label>
+              <!-- ID source toggle -->
+              <div style="display:flex;gap:8px;margin-bottom:14px;">
+                <button class="kyc-src-btn active" id="idSrcCamera" onclick="idSetSource('camera')"><i class="fa-solid fa-camera"></i> Camera</button>
+                <button class="kyc-src-btn" id="idSrcUpload" onclick="idSetSource('upload')"><i class="fa-solid fa-upload"></i> Upload</button>
+              </div>
+
+              <!-- ID Camera mode -->
+              <div id="idCameraMode" class="upload-group">
+                <label class="upload-label"><i class="fa-solid fa-id-card"></i> <span id="apIdLabel">National ID Card</span> <span class="upload-optional">Front side — hold flat in frame</span></label>
+                <div class="kyc-cam-wrap" id="idCamWrap">
+                  <video id="idCamVideo" autoplay playsinline muted style="display:none;"></video>
+                  <canvas id="idCamCanvas" style="display:none;"></canvas>
+                  <div class="id-frame-corner tl"></div>
+                  <div class="id-frame-corner tr"></div>
+                  <div class="id-frame-corner bl"></div>
+                  <div class="id-frame-corner br"></div>
+                  <div class="kyc-cam-idle" id="idCamIdle">
+                    <i class="fa-solid fa-id-card" style="font-size:36px;color:#9ca3af;margin-bottom:10px;"></i>
+                    <span style="font-weight:600;font-size:14px;color:#6b7280;">Tap to start camera</span>
+                  </div>
+                  <img id="idCapturedImg" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:14px;" />
+                </div>
+                <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;" id="idCamBtns" style="display:none;">
+                  <button class="kyc-action-btn" id="idStartBtn" onclick="idCamStart()"><i class="fa-solid fa-camera"></i> Start Camera</button>
+                  <button class="kyc-action-btn kyc-capture-btn" id="idCaptureBtn" style="display:none;" onclick="idCamCapture()"><i class="fa-solid fa-circle"></i> Capture</button>
+                  <button class="kyc-action-btn kyc-retry-btn" id="idRetryBtn" style="display:none;" onclick="idCamRetry()"><i class="fa-solid fa-rotate-left"></i> Retry</button>
+                </div>
+              </div>
+
+              <!-- ID Upload mode -->
+              <div id="idUploadMode" class="upload-group" style="display:none;">
+                <label class="upload-label"><i class="fa-solid fa-id-card"></i> <span>Upload ID Document</span> <span class="upload-optional">Front side</span></label>
                 <div class="id-frame-wrap" onclick="document.getElementById('apIdFile').click()">
                   <div class="id-frame-corner tl"></div>
                   <div class="id-frame-corner tr"></div>
@@ -306,24 +335,30 @@
                   <div class="id-frame-corner br"></div>
                   <div class="id-frame-inner" id="apIdPreview">
                     <i class="fa-solid fa-id-card" style="font-size:36px;color:#9ca3af;margin-bottom:10px;"></i>
-                    <span style="font-weight:600;font-size:14px;color:#374151;">Position your ID here</span>
+                    <span style="font-weight:600;font-size:14px;color:#374151;">Click to upload</span>
                     <small style="color:var(--muted);margin-top:4px;">JPG, PNG, PDF · Max 10MB</small>
                   </div>
                 </div>
                 <input type="file" id="apIdFile" accept="image/*,.pdf" style="display:none;" onchange="apPreviewId()" />
               </div>
 
-              <!-- Selfie with face oval -->
+              <!-- Selfie Camera -->
               <div class="upload-group" style="margin-top:20px;">
                 <label class="upload-label"><i class="fa-solid fa-camera"></i> Verification Selfie <span class="upload-optional">Optional</span></label>
-                <div class="selfie-frame-wrap" onclick="document.getElementById('apSelfie').click()">
-                  <div class="selfie-oval-ring"></div>
-                  <div class="selfie-scan-line"></div>
+                <div class="selfie-frame-wrap" id="selfieCamWrap" onclick="selfieCamInit()">
+                  <video id="selfieCamVideo" autoplay playsinline muted style="display:none;position:absolute;width:100%;height:100%;object-fit:cover;border-radius:20px;"></video>
+                  <img id="selfieCapturedImg" style="display:none;position:absolute;width:100%;height:100%;object-fit:cover;border-radius:20px;" />
+                  <div class="selfie-oval-ring" id="selfieOval"></div>
+                  <div class="selfie-scan-line" id="selfieScan"></div>
                   <div class="selfie-inner" id="apSelfiePreview">
                     <i class="fa-solid fa-face-smile" style="font-size:40px;color:#9ca3af;margin-bottom:8px;"></i>
-                    <span style="font-weight:600;font-size:13px;color:#374151;">Face the camera</span>
-                    <small style="color:var(--muted);margin-top:4px;">JPG, PNG · Max 5MB</small>
+                    <span style="font-weight:600;font-size:13px;color:#9ca3af;">Tap to open camera</span>
                   </div>
+                </div>
+                <canvas id="selfieCamCanvas" style="display:none;"></canvas>
+                <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+                  <button class="kyc-action-btn kyc-capture-btn" id="selfieCaptureBtn" style="display:none;" onclick="selfieCamCapture()"><i class="fa-solid fa-circle"></i> Take Selfie</button>
+                  <button class="kyc-action-btn kyc-retry-btn" id="selfieRetryBtn" style="display:none;" onclick="selfieCamRetry()"><i class="fa-solid fa-rotate-left"></i> Retry</button>
                 </div>
                 <input type="file" id="apSelfie" accept="image/*" style="display:none;" onchange="apPreviewSelfie()" />
               </div>

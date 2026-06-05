@@ -1215,6 +1215,32 @@ img { max-width: 100%; }
 .id-frame-corner.br { bottom: 12px; right: 12px; border-bottom-width: 3px; border-right-width: 3px; border-radius: 0 0 4px 0; }
 .id-frame-inner { display: flex; flex-direction: column; align-items: center; z-index: 1; }
 
+/* KYC source toggle */
+.kyc-src-btn {
+  flex: 1; padding: 9px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+  background: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+  color: var(--muted); transition: all .2s;
+}
+.kyc-src-btn.active { border-color: var(--blue); background: var(--blue-l); color: var(--blue); }
+
+/* KYC camera wrap */
+.kyc-cam-wrap {
+  position: relative; width: 100%; aspect-ratio: 16/10;
+  background: #1a1a2e; border-radius: 14px; overflow: hidden;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.kyc-cam-idle { display: flex; flex-direction: column; align-items: center; z-index: 2; }
+.kyc-cam-wrap video { position: absolute; width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
+
+/* KYC action buttons */
+.kyc-action-btn {
+  padding: 10px 20px; border: none; border-radius: 10px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit; background: var(--dark); color: #fff; transition: opacity .2s;
+}
+.kyc-action-btn:hover { opacity: .85; }
+.kyc-capture-btn { background: #2563eb; }
+.kyc-retry-btn { background: #6b7280; }
+
 /* Selfie frame */
 .selfie-frame-wrap {
   position: relative;
