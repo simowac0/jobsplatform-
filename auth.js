@@ -48,7 +48,7 @@ async function handleLogin(e) {
   setLoading('loginTxt', 'loginSpin', true);
 
   // Wait for config.js to finish if needed
-  await new Promise(function(r) { setTimeout(r, 300); });
+  for (var _i = 0; _i < 20; _i++) { if (window.sb !== undefined) break; await new Promise(function(r){setTimeout(r,100);}); }
 
   if (window.sb) {
     var { data, error } = await window.sb.auth.signInWithPassword({ email, password });
@@ -78,7 +78,7 @@ async function handleRegister() {
   if (password.length < 8) { showMsg('regMsg', 'Password must be at least 8 characters.', 'error'); return; }
   setLoading('regTxt', 'regSpin', true);
 
-  await new Promise(function(r) { setTimeout(r, 300); });
+  for (var _i = 0; _i < 20; _i++) { if (window.sb !== undefined) break; await new Promise(function(r){setTimeout(r,100);}); }
 
   if (window.sb) {
     var { data: authData, error: authErr } = await window.sb.auth.signUp({ email, password });
@@ -110,7 +110,11 @@ async function handleRegister() {
 
 // ─── SOCIAL LOGIN ────────────────────────────────────────────
 async function socialLogin(provider) {
-  await new Promise(function(r) { setTimeout(r, 500); });
+  // Wait up to 3s for config.js to init window.sb
+  for (var i = 0; i < 30; i++) {
+    if (window.sb) break;
+    await new Promise(function(r) { setTimeout(r, 100); });
+  }
   if (window.sb) {
     var redirectTo = window.location.origin + '/jobs.html';
     var returnUrl  = new URLSearchParams(window.location.search).get('returnUrl');
@@ -118,7 +122,7 @@ async function socialLogin(provider) {
     var { error } = await window.sb.auth.signInWithOAuth({ provider, options: { redirectTo } });
     if (error) showMsg('loginMsg', error.message, 'error');
   } else {
-    alert('Social login requires Supabase configuration. Please use email/password.');
+    showMsg('loginMsg', 'Connection error. Please try email/password.', 'error');
   }
 }
 
