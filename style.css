@@ -967,7 +967,9 @@ img { max-width: 100%; }
 }
 
 @media (max-width: 768px) {
-  .nav-links, .nav-right { display: none; }
+  .nav-links { display: none; }
+  .nav-right { display: flex; }
+  .nav-right .btn-primary { display: none; }
   .hamburger { display: flex; }
 
   .hero-inner { grid-template-columns: 1fr; gap: 48px; }
