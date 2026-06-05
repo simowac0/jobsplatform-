@@ -560,17 +560,42 @@ function applyGoStep(n) {
 }
 
 function applyStep2() {
-  var fn = document.getElementById('ap_fn').value.trim();
-  var ln = document.getElementById('ap_ln').value.trim();
-  var em = document.getElementById('ap_em').value.trim();
-  var ph = document.getElementById('ap_ph').value.trim();
-  var ct = document.getElementById('ap_city').value.trim();
-  var pc = document.getElementById('ap_post').value.trim();
-  var ad = document.getElementById('ap_addr').value.trim();
-  if (!fn||!ln||!em||!ph||!ct||!pc||!ad) {
-    showApplyMsg('applyMsg1','Please fill in all required fields.','error'); return;
+  var fields = ['ap_fn','ap_ln','ap_em','ap_ph','ap_city','ap_post','ap_addr','ap_dob'];
+  var vals = {};
+  var hasError = false;
+
+  fields.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var val = el.value.trim();
+    vals[id] = val;
+    if (!val) {
+      el.style.borderColor = '#dc2626';
+      hasError = true;
+    } else {
+      el.style.borderColor = '';
+    }
+  });
+
+  // Email format
+  var emEl = document.getElementById('ap_em');
+  if (vals['ap_em'] && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(vals['ap_em'])) {
+    emEl.style.borderColor = '#dc2626';
+    showApplyMsg('applyMsg1', 'Please enter a valid email address.', 'error'); return;
   }
-  showApplyMsg('applyMsg1','','');
+
+  // Phone: min 7 digits
+  var phEl = document.getElementById('ap_ph');
+  if (vals['ap_ph'] && vals['ap_ph'].replace(/\D/g,'').length < 7) {
+    phEl.style.borderColor = '#dc2626';
+    showApplyMsg('applyMsg1', 'Please enter a valid phone number.', 'error'); return;
+  }
+
+  if (hasError) {
+    showApplyMsg('applyMsg1', 'Please fill in all required fields.', 'error'); return;
+  }
+
+  showApplyMsg('applyMsg1', '', '');
   applyGoStep(2);
 }
 
