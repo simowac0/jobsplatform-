@@ -3,16 +3,131 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign In / Register – JobsPlatform</title>
+  <title>Sign In – JobsPlatform</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="webhook.js"></script>
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f0f4ff 0%, #faf8f5 100%);
+      padding: 24px 16px;
+    }
+    .auth-box {
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.10);
+      width: 100%;
+      max-width: 440px;
+      padding: 40px 36px;
+    }
+    .auth-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .auth-logo .logo-icon {
+      width: 40px; height: 40px;
+      background: var(--blue);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 18px;
+    }
+    .auth-logo span { font-size: 22px; font-weight: 800; color: var(--dark); }
+    .auth-tabs {
+      display: flex;
+      background: #f3f4f6;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 28px;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .auth-tab.active {
+      background: #fff;
+      color: var(--dark);
+      box-shadow: 0 1px 6px rgba(0,0,0,.10);
+    }
+    .social-btns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .social-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      font-size: 14px; font-weight: 600; color: var(--dark);
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      font-family: inherit;
+    }
+    .social-btn:hover { border-color: #aaa; background: #fafafa; }
+    .social-btn i { font-size: 16px; }
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--muted); font-size: 13px;
+      margin-bottom: 20px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1;
+      height: 1px; background: var(--border);
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .input-wrap { position: relative; }
+    .input-wrap i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+    .input-wrap input {
+      width: 100%; padding: 12px 14px 12px 38px;
+      border: 1.5px solid var(--border); border-radius: 12px;
+      font-size: 14px; font-family: inherit; color: var(--dark);
+      background: #f7f1e8; outline: none;
+      transition: border-color .2s;
+      box-sizing: border-box;
+    }
+    .input-wrap input:focus { border-color: var(--blue); background: #fff; }
+    .toggle-pass {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: var(--muted); font-size: 14px;
+    }
+    .form-msg { font-size: 13px; margin: 8px 0; padding: 10px 14px; border-radius: 10px; display: none; }
+    .form-msg.error   { display: block; background: #fef2f2; color: #dc2626; }
+    .form-msg.success { display: block; background: #f0fdf4; color: #16a34a; }
+    .btn-submit {
+      width: 100%; padding: 14px;
+      background: var(--dark); color: #fff;
+      border: none; border-radius: 14px;
+      font-size: 15px; font-weight: 700; font-family: inherit;
+      cursor: pointer; margin-top: 4px;
+      transition: opacity .2s;
+    }
+    .btn-submit:hover { opacity: .88; }
+    .auth-footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 20px; }
+    .auth-footer a { color: var(--blue); font-weight: 600; }
+    .success-view { text-align: center; padding: 20px 0; }
+    .success-view .check { font-size: 56px; color: var(--green); margin-bottom: 16px; }
+    .success-view h3 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .success-view p { color: var(--muted); }
+  </style>
 </head>
 <body>
 
@@ -23,284 +138,115 @@
         <span class="logo-text">Jobs<strong>Platform</strong></span>
       </a>
       <nav class="nav-links">
-        <a href="jobs.html" data-t="nav_jobs">Jobs</a>
-        <a href="jobs.html?tab=companies" data-t="nav_companies">Companies</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="jobs.html?tab=companies">Companies</a>
       </nav>
       <div class="nav-right">
         <span class="lang-btn"><i class="fa-solid fa-globe lang-globe"></i><span class="lang-code">GB</span><span class="lang-label">EN</span><i class="fa-solid fa-chevron-down lang-caret"></i></span>
         <div class="nav-auth-zone" style="display:flex;align-items:center;gap:10px;">
-          <a href="login.html" class="btn-ghost" data-t="nav_signin">Sign In</a>
-          <a href="login.html?tab=register&role=employer" class="btn-primary" data-t="nav_post">Post a Job</a>
+          <a href="login.html" class="btn-ghost">Sign In</a>
+          <a href="login.html?tab=register&role=employer" class="btn-primary">Post a Job</a>
         </div>
       </div>
       <button class="hamburger" id="hamburger"><i class="fa-solid fa-bars"></i></button>
     </div>
     <div class="mobile-menu" id="mobileMenu">
-      <a href="jobs.html" data-t="nav_jobs">Jobs</a>
-      <a href="jobs.html?tab=companies" data-t="nav_companies">Companies</a>
-      <a href="login.html" data-t="nav_signin">Sign In</a>
-      <a href="login.html?tab=register&role=employer" class="btn-primary" style="display:inline-block;margin-top:10px;" data-t="nav_post">Post a Job</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="login.html">Sign In</a>
     </div>
   </header>
 
-  <section class="auth-section">
-    <div class="auth-wrapper">
+  <div class="auth-page">
+    <div class="auth-box">
 
-      <!-- LEFT -->
-      <div class="auth-left">
-        <div class="auth-left-content">
-          <div class="auth-brand">
-            <span class="logo-icon"><i class="fa-solid fa-briefcase"></i></span>
-            <span style="font-size:22px;font-weight:800;color:#fff;">Jobs<strong>Platform</strong></span>
+      <div class="auth-logo">
+        <span class="logo-icon"><i class="fa-solid fa-briefcase"></i></span>
+        <span>Jobs<strong>Platform</strong></span>
+      </div>
+
+      <!-- TABS -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabSignin"   onclick="switchTab('signin')">Sign In</button>
+        <button class="auth-tab"        id="tabRegister" onclick="switchTab('register')">Create Account</button>
+      </div>
+
+      <!-- ══ SIGN IN ══ -->
+      <div id="signinBlock">
+        <form onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label>Email</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-envelope"></i>
+              <input type="email" id="loginEmail" placeholder="you@example.com" required />
+            </div>
           </div>
-          <h2>Your next job is waiting for you.</h2>
-          <p>Join 50,000+ job seekers who found their next role with verified listings and guaranteed employer responses.</p>
-          <div class="auth-features">
-            <div class="auth-feat"><i class="fa-solid fa-circle-check"></i> No ghost jobs — all listings verified</div>
-            <div class="auth-feat"><i class="fa-solid fa-reply"></i> Employers respond within 48 hours</div>
-            <div class="auth-feat"><i class="fa-solid fa-sterling-sign"></i> Full salary shown on every listing</div>
-            <div class="auth-feat"><i class="fa-solid fa-shield-halved"></i> Your data is secure &amp; private</div>
+          <div class="form-group">
+            <label>Password <a href="#" onclick="showForgot();return false;" style="float:right;font-size:12px;color:var(--blue);font-weight:500;">Forgot?</a></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" id="loginPassword" placeholder="••••••••" required />
+              <button type="button" class="toggle-pass" onclick="togglePass('loginPassword',this)"><i class="fa-solid fa-eye"></i></button>
+            </div>
           </div>
-          <div class="auth-testimonial">
-            <div class="stars" style="margin-bottom:8px;font-size:14px;"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-            <p>"Found my dream job in 2 weeks. The salary transparency is a game changer."</p>
-            <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
-              <div class="author-avatar ap" style="width:36px;height:36px;font-size:12px;">MP</div>
-              <div><strong style="color:#fff;font-size:14px;">Mike P.</strong><br><span style="font-size:12px;color:rgba(255,255,255,0.65);">Software Engineer at TechCorp</span></div>
+          <div class="form-msg" id="loginMsg"></div>
+          <button type="submit" class="btn-submit">
+            <span id="loginTxt">Sign In</span>
+            <span id="loginSpin" style="display:none;"><i class="fa-solid fa-spinner fa-spin"></i></span>
+          </button>
+        </form>
+        <div class="auth-footer">Don't have an account? <a href="#" onclick="switchTab('register');return false;">Create one free</a></div>
+      </div>
+
+      <!-- ══ REGISTER ══ -->
+      <div id="registerBlock" style="display:none;">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First name</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-user"></i>
+              <input type="text" id="regFirstName" placeholder="John" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Last name</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-user"></i>
+              <input type="text" id="regLastName" placeholder="Doe" required />
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- RIGHT -->
-      <div class="auth-right">
-        <div class="auth-card">
-
-          <!-- TABS -->
-          <div class="auth-tabs">
-            <button class="auth-tab active" id="tabSignin"   onclick="switchTab('signin')"   data-t="tab_signin">Sign In</button>
-            <button class="auth-tab"        id="tabRegister" onclick="switchTab('register')" data-t="tab_reg">Create Account</button>
+        <div class="form-group">
+          <label>Email</label>
+          <div class="input-wrap">
+            <i class="fa-regular fa-envelope"></i>
+            <input type="email" id="regEmail" placeholder="you@example.com" required />
           </div>
-
-          <!-- ══ SIGN IN ══ -->
-          <div class="auth-form-block" id="signinForm">
-            <h3 data-t="signin_h">Welcome back</h3>
-            <p class="form-sub" data-t="signin_sub">Sign in to your JobsPlatform account</p>
-
-            <div class="social-auth">
-              <button class="social-btn" onclick="socialLogin('google')"><i class="fa-brands fa-google"></i> Continue with Google</button>
-              <button class="social-btn" onclick="socialLogin('linkedin')"><i class="fa-brands fa-linkedin"></i> Continue with LinkedIn</button>
-              <button class="social-btn" onclick="socialLogin('facebook')"><i class="fa-brands fa-facebook"></i> Continue with Facebook</button>
-            </div>
-            <div class="divider"><span>or sign in with email</span></div>
-
-            <form id="loginForm" onsubmit="handleLogin(event)">
-              <div class="form-group">
-                <label>Email address</label>
-                <div class="input-wrap"><i class="fa-regular fa-envelope"></i>
-                  <input type="email" id="loginEmail" placeholder="you@example.com" required />
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Password <a href="#" class="forgot-link" onclick="showForgot();return false;">Forgot?</a></label>
-                <div class="input-wrap"><i class="fa-solid fa-lock"></i>
-                  <input type="password" id="loginPassword" placeholder="••••••••" required />
-                  <button type="button" class="toggle-pass" onclick="togglePass('loginPassword',this)"><i class="fa-solid fa-eye"></i></button>
-                </div>
-              </div>
-              <label class="remember-me"><input type="checkbox" /> Remember me for 30 days</label>
-              <div class="form-msg" id="loginMsg"></div>
-              <button type="submit" class="btn-dark-pill">
-                <span id="loginBtnText">Sign In</span>
-                <span id="loginSpinner" style="display:none;"><i class="fa-solid fa-spinner fa-spin"></i></span>
-              </button>
-            </form>
-            <p class="switch-link">Don't have an account? <a href="#" onclick="switchTab('register');return false;">Create one free</a></p>
-          </div>
-
-          <!-- ══ REGISTER — STEP 1: Role ══ -->
-          <div class="auth-form-block" id="registerForm" style="display:none;">
-
-            <!-- Step indicator -->
-            <div class="reg-steps" id="regSteps">
-              <div class="reg-step active" id="step-dot-1">1</div>
-              <div class="reg-step-line"></div>
-              <div class="reg-step" id="step-dot-2">2</div>
-              <div class="reg-step-line"></div>
-              <div class="reg-step" id="step-dot-3">3</div>
-            </div>
-
-            <!-- STEP 1: Basic info -->
-            <div id="regStep1">
-              <div class="role-pill-wrap">
-                <button class="role-pill active" id="roleJobseeker" onclick="selectRole('jobseeker')">
-                  <i class="fa-solid fa-magnifying-glass"></i> Job Seeker
-                </button>
-                <button class="role-pill" id="roleEmployer" onclick="selectRole('employer')">
-                  <i class="fa-regular fa-building"></i> Recruiter
-                </button>
-              </div>
-
-              <div class="reg-card">
-                <div class="reg-checkmark"><i class="fa-solid fa-check"></i></div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>First name</label>
-                    <div class="input-wrap input-cream"><i class="fa-regular fa-user"></i>
-                      <input type="text" id="regFirstName" placeholder="John" required />
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label>Last name</label>
-                    <div class="input-wrap input-cream"><i class="fa-regular fa-user"></i>
-                      <input type="text" id="regLastName" placeholder="Doe" required />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label>Email</label>
-                  <div class="input-wrap input-cream"><i class="fa-regular fa-envelope"></i>
-                    <input type="email" id="regEmail" placeholder="you@company.com" required />
-                  </div>
-                </div>
-
-                <div class="form-group" id="companyGroup" style="display:none;">
-                  <label>Company Name</label>
-                  <div class="input-wrap input-cream"><i class="fa-solid fa-building"></i>
-                    <input type="text" id="regCompany" placeholder="Your Company Ltd" />
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label>Password</label>
-                  <div class="input-wrap input-cream"><i class="fa-solid fa-lock"></i>
-                    <input type="password" id="regPassword" placeholder="Min. 8 characters" required minlength="8" oninput="checkPassStrength(this.value)" />
-                    <button type="button" class="toggle-pass" onclick="togglePass('regPassword',this)"><i class="fa-solid fa-eye"></i></button>
-                  </div>
-                  <div class="pass-strength" id="passStrength"></div>
-                </div>
-
-                <div class="form-group">
-                  <label>Confirm password</label>
-                  <div class="input-wrap input-cream"><i class="fa-solid fa-lock"></i>
-                    <input type="password" id="regConfirm" placeholder="Repeat password" required minlength="8" />
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-msg" id="regMsg1"></div>
-              <button class="btn-dark-pill" onclick="goStep2()">
-                Continue <i class="fa-solid fa-arrow-right"></i>
-              </button>
-              <p class="switch-link">Already have an account? <a href="#" onclick="switchTab('signin');return false;">Sign in</a></p>
-              <p class="switch-link" style="margin-top:6px;">Not a manager? <a href="jobs.html">Browse jobs instead</a></p>
-            </div>
-
-            <!-- STEP 2: Profile photo + CV -->
-            <div id="regStep2" style="display:none;">
-              <h3 style="font-size:20px;font-weight:800;margin-bottom:6px;">Profile &amp; Documents</h3>
-              <p class="form-sub">Upload your photo and CV to stand out to employers</p>
-
-              <!-- Photo upload -->
-              <div class="upload-group">
-                <label class="upload-label">
-                  <i class="fa-regular fa-image"></i> Profile Photo
-                  <span class="upload-optional">Optional but recommended</span>
-                </label>
-                <div class="upload-box" id="photoBox" onclick="document.getElementById('photoInput').click()">
-                  <div class="upload-box-inner" id="photoPreview">
-                    <i class="fa-solid fa-camera"></i>
-                    <span>Click to upload photo</span>
-                    <small>JPG, PNG · Max 5MB</small>
-                  </div>
-                </div>
-                <input type="file" id="photoInput" accept="image/*" style="display:none;" onchange="previewFile('photoInput','photoPreview','photo')" />
-              </div>
-
-              <!-- CV upload -->
-              <div class="upload-group">
-                <label class="upload-label">
-                  <i class="fa-regular fa-file-pdf"></i> CV / Resume
-                  <span class="upload-optional">PDF or Word</span>
-                </label>
-                <div class="upload-box" id="cvBox" onclick="document.getElementById('cvInput').click()">
-                  <div class="upload-box-inner" id="cvPreview">
-                    <i class="fa-solid fa-file-arrow-up"></i>
-                    <span>Click to upload CV</span>
-                    <small>PDF, DOC, DOCX · Max 10MB</small>
-                  </div>
-                </div>
-                <input type="file" id="cvInput" accept=".pdf,.doc,.docx,application/pdf,application/msword" style="display:none;" onchange="previewFile('cvInput','cvPreview','cv')" />
-              </div>
-
-              <div class="form-msg" id="regMsg2"></div>
-              <div style="display:flex;gap:10px;">
-                <button class="btn-ghost" style="flex:1;" onclick="goStep(1)">← Back</button>
-                <button class="btn-dark-pill" style="flex:2;" onclick="goStep3()">Continue →</button>
-              </div>
-            </div>
-
-            <!-- STEP 3: Identity document -->
-            <div id="regStep3" style="display:none;">
-              <h3 style="font-size:20px;font-weight:800;margin-bottom:6px;">Identity Verification</h3>
-              <p class="form-sub">Upload a copy of your national ID or passport</p>
-
-              <div class="id-type-toggle">
-                <button class="id-btn active" id="idTypeNational" onclick="selectIdType('national')">
-                  <i class="fa-solid fa-id-card"></i> National ID
-                </button>
-                <button class="id-btn" id="idTypePassport" onclick="selectIdType('passport')">
-                  <i class="fa-solid fa-passport"></i> Passport
-                </button>
-              </div>
-
-              <div class="upload-group">
-                <label class="upload-label">
-                  <span id="idDocLabel">National ID Card</span>
-                  <span class="upload-optional">Front side</span>
-                </label>
-                <div class="upload-box" onclick="document.getElementById('idInput').click()">
-                  <div class="upload-box-inner" id="idPreview">
-                    <i class="fa-solid fa-id-card"></i>
-                    <span>Click to upload document</span>
-                    <small>JPG, PNG, PDF · Max 10MB</small>
-                  </div>
-                </div>
-                <input type="file" id="idInput" accept="image/*,.pdf" style="display:none;" onchange="previewFile('idInput','idPreview','id')" />
-              </div>
-
-              <div class="upload-note">
-                <i class="fa-solid fa-shield-halved"></i>
-                Your documents are encrypted and only used for identity verification. They are never shared with employers.
-              </div>
-
-              <div class="form-msg" id="regMsg3"></div>
-              <div style="display:flex;gap:10px;margin-top:16px;">
-                <button class="btn-ghost" style="flex:1;" onclick="goStep(2)">← Back</button>
-                <button class="btn-dark-pill" style="flex:2;" onclick="handleRegister()" id="submitRegBtn">
-                  <span id="regBtnText">Create Account <i class="fa-solid fa-check"></i></span>
-                  <span id="regSpinner" style="display:none;"><i class="fa-solid fa-spinner fa-spin"></i></span>
-                </button>
-              </div>
-              <p class="switch-link" style="margin-top:16px;">Already have an account? <a href="#" onclick="switchTab('signin');return false;">Sign in</a></p>
-            </div>
-
-          </div><!-- /registerForm -->
-
-          <!-- SUCCESS -->
-          <div class="auth-form-block" id="successBlock" style="display:none;text-align:center;padding:20px 0;">
-            <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
-            <h3 id="successTitle" style="font-size:22px;font-weight:800;margin-bottom:8px;">Account Created!</h3>
-            <p id="successMsg" class="form-sub">Redirecting to jobs...</p>
-            <a href="jobs.html" class="btn-dark-pill" style="display:inline-flex;justify-content:center;margin-top:20px;">Browse Jobs Now</a>
-          </div>
-
         </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="regPassword" placeholder="Min. 8 characters" required minlength="8" />
+            <button type="button" class="toggle-pass" onclick="togglePass('regPassword',this)"><i class="fa-solid fa-eye"></i></button>
+          </div>
+        </div>
+        <div class="form-msg" id="regMsg"></div>
+        <button class="btn-submit" onclick="handleRegister()">
+          <span id="regTxt">Create Account</span>
+          <span id="regSpin" style="display:none;"><i class="fa-solid fa-spinner fa-spin"></i></span>
+        </button>
+        <div class="auth-footer">Already have an account? <a href="#" onclick="switchTab('signin');return false;">Sign in</a></div>
       </div>
+
+      <!-- ══ SUCCESS ══ -->
+      <div id="successBlock" style="display:none;" class="success-view">
+        <div class="check"><i class="fa-solid fa-circle-check"></i></div>
+        <h3 id="successTitle">Welcome!</h3>
+        <p id="successMsg">Redirecting...</p>
+      </div>
+
     </div>
-  </section>
+  </div>
 
   <script src="main.js"></script>
   <script src="auth.js"></script>
