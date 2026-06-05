@@ -346,9 +346,37 @@ function signOut() {
   setTimeout(function(){ window.location.href = 'index.html'; }, 280);
 }
 
+// ─── OAUTH CALLBACK HANDLER ──────────────────────────────────
+async function handleOAuthCallback() {
+  if (!window.location.hash.includes('access_token')) return;
+  // Wait for window.sb (config.js async)
+  for (var i = 0; i < 50; i++) {
+    if (window.sb) break;
+    await new Promise(function(r) { setTimeout(r, 100); });
+  }
+  if (!window.sb) return;
+  var { data: { session } } = await window.sb.auth.getSession();
+  if (!session || !session.user) return;
+  var u = session.user;
+  var meta = u.user_metadata || {};
+  var fullName = meta.full_name || meta.name || '';
+  var user = {
+    id: u.id,
+    email: u.email,
+    firstName: fullName ? fullName.split(' ')[0] : u.email.split('@')[0],
+    lastName:  fullName ? fullName.split(' ').slice(1).join(' ') : '',
+    avatar: meta.avatar_url || '',
+    role: 'jobseeker'
+  };
+  localStorage.setItem('jp_user', JSON.stringify(user));
+  history.replaceState(null, '', window.location.pathname + window.location.search);
+  updateNavAuth();
+}
+
 // ─── INIT ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   buildLangDropdown();
   applyLang(currentLang);
   updateNavAuth();
+  handleOAuthCallback();
 });
