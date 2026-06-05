@@ -274,40 +274,61 @@
 
             <!-- STEP 2: ID Verification -->
             <div id="applyStep2" style="display:none;">
-              <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">Identity Document</h3>
-              <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Upload a valid photo ID. Your data is encrypted and never shared.</p>
+              <h3 style="font-size:18px;font-weight:700;margin-bottom:4px;">Documents & Verification</h3>
+              <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Your data is encrypted and only used for verification.</p>
 
-              <div class="id-type-toggle" style="margin-bottom:20px;">
+              <!-- CV Upload -->
+              <div class="upload-group">
+                <label class="upload-label"><i class="fa-solid fa-file-pdf" style="color:#e53e3e;"></i> CV / Resume <span style="color:#f97316;font-size:12px;">Required</span></label>
+                <div class="cv-upload-box" id="cvUploadBox" onclick="document.getElementById('apCvFile').click()">
+                  <div class="cv-upload-inner" id="apCvPreview">
+                    <i class="fa-solid fa-cloud-arrow-up" style="font-size:32px;color:#6b7280;margin-bottom:8px;"></i>
+                    <span style="font-weight:600;font-size:14px;">Click to upload your CV</span>
+                    <small style="color:var(--muted);">PDF only · Max 5MB</small>
+                  </div>
+                </div>
+                <input type="file" id="apCvFile" accept=".pdf,application/pdf" style="display:none;" onchange="apPreviewCv()" />
+              </div>
+
+              <!-- ID Type Toggle -->
+              <div class="id-type-toggle" style="margin:20px 0 16px;">
                 <button class="id-btn active" id="apIdNational" onclick="apSelectId('national')"><i class="fa-solid fa-id-card"></i> National ID</button>
                 <button class="id-btn" id="apIdPassport" onclick="apSelectId('passport')"><i class="fa-solid fa-passport"></i> Passport</button>
               </div>
 
+              <!-- ID Frame -->
               <div class="upload-group">
-                <label class="upload-label"><i class="fa-solid fa-id-card"></i> <span id="apIdLabel">National ID Card</span><span class="upload-optional">Front side</span></label>
-                <div class="upload-box" onclick="document.getElementById('apIdFile').click()">
-                  <div class="upload-box-inner" id="apIdPreview">
-                    <i class="fa-solid fa-id-card"></i>
-                    <span>Click to upload document</span>
-                    <small>JPG, PNG, PDF · Max 10MB</small>
+                <label class="upload-label"><i class="fa-solid fa-id-card"></i> <span id="apIdLabel">National ID Card</span> <span class="upload-optional">Front side</span></label>
+                <div class="id-frame-wrap" onclick="document.getElementById('apIdFile').click()">
+                  <div class="id-frame-corner tl"></div>
+                  <div class="id-frame-corner tr"></div>
+                  <div class="id-frame-corner bl"></div>
+                  <div class="id-frame-corner br"></div>
+                  <div class="id-frame-inner" id="apIdPreview">
+                    <i class="fa-solid fa-id-card" style="font-size:36px;color:#9ca3af;margin-bottom:10px;"></i>
+                    <span style="font-weight:600;font-size:14px;color:#374151;">Position your ID here</span>
+                    <small style="color:var(--muted);margin-top:4px;">JPG, PNG, PDF · Max 10MB</small>
                   </div>
                 </div>
                 <input type="file" id="apIdFile" accept="image/*,.pdf" style="display:none;" onchange="apPreviewId()" />
               </div>
 
-              <!-- Selfie -->
-              <div class="upload-group">
-                <label class="upload-label"><i class="fa-solid fa-camera"></i> Verification Selfie<span class="upload-optional">Optional</span></label>
-                <div class="upload-box" onclick="document.getElementById('apSelfie').click()">
-                  <div class="upload-box-inner" id="apSelfiePreview">
-                    <i class="fa-solid fa-camera-retro"></i>
-                    <span>Upload a clear selfie photo</span>
-                    <small>JPG, PNG · Max 5MB</small>
+              <!-- Selfie with face oval -->
+              <div class="upload-group" style="margin-top:20px;">
+                <label class="upload-label"><i class="fa-solid fa-camera"></i> Verification Selfie <span class="upload-optional">Optional</span></label>
+                <div class="selfie-frame-wrap" onclick="document.getElementById('apSelfie').click()">
+                  <div class="selfie-oval-ring"></div>
+                  <div class="selfie-scan-line"></div>
+                  <div class="selfie-inner" id="apSelfiePreview">
+                    <i class="fa-solid fa-face-smile" style="font-size:40px;color:#9ca3af;margin-bottom:8px;"></i>
+                    <span style="font-weight:600;font-size:13px;color:#374151;">Face the camera</span>
+                    <small style="color:var(--muted);margin-top:4px;">JPG, PNG · Max 5MB</small>
                   </div>
                 </div>
                 <input type="file" id="apSelfie" accept="image/*" style="display:none;" onchange="apPreviewSelfie()" />
               </div>
 
-              <div class="upload-note" style="margin-bottom:20px;">
+              <div class="upload-note" style="margin:16px 0;">
                 <i class="fa-solid fa-shield-halved"></i>
                 Your documents are encrypted and only used for identity verification.
               </div>

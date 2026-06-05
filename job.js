@@ -600,24 +600,34 @@ function applyStep2() {
 }
 
 function applyStep3() {
+  var cvFile = document.getElementById('apCvFile').files[0];
   var idFile = document.getElementById('apIdFile').files[0];
+  if (!cvFile) { showApplyMsg('applyMsg2','Please upload your CV.','error'); return; }
   if (!idFile) { showApplyMsg('applyMsg2','Please upload your identity document.','error'); return; }
   showApplyMsg('applyMsg2','','');
 
-  // Build review card
   var rev = document.getElementById('reviewData');
   rev.innerHTML = [
-    ['Name',     document.getElementById('ap_fn').value + ' ' + document.getElementById('ap_ln').value],
-    ['Email',    document.getElementById('ap_em').value],
-    ['Phone',    document.getElementById('ap_ph').value],
-    ['City',     document.getElementById('ap_city').value],
-    ['Address',  document.getElementById('ap_addr').value],
-    ['ID Doc',   idFile.name],
+    ['Name',    document.getElementById('ap_fn').value + ' ' + document.getElementById('ap_ln').value],
+    ['Email',   document.getElementById('ap_em').value],
+    ['Phone',   document.getElementById('ap_ph').value],
+    ['City',    document.getElementById('ap_city').value],
+    ['Address', document.getElementById('ap_addr').value],
+    ['CV',      cvFile.name],
+    ['ID Doc',  idFile.name],
   ].map(function(r){
     return '<div class="review-row"><span>'+r[0]+'</span><strong>'+r[1]+'</strong></div>';
   }).join('');
 
   applyGoStep(3);
+}
+
+function apPreviewCv() {
+  var file = document.getElementById('apCvFile').files[0];
+  if (!file) return;
+  var box = document.getElementById('apCvPreview');
+  box.innerHTML = '<i class="fa-solid fa-file-pdf" style="font-size:32px;color:#e53e3e;margin-bottom:8px;"></i><span style="font-weight:600;font-size:14px;color:var(--green);">'+file.name+'</span><small style="color:var(--muted);">'+formatSz(file.size)+'</small>';
+  document.getElementById('cvUploadBox').classList.add('has-file');
 }
 
 function apSelectId(type) {
@@ -630,7 +640,7 @@ function apPreviewId() {
   var file = document.getElementById('apIdFile').files[0];
   if (!file) return;
   var box = document.getElementById('apIdPreview');
-  box.innerHTML = '<i class="fa-solid fa-id-card" style="font-size:28px;color:var(--green);"></i><span style="font-size:13px;font-weight:600;color:var(--green);">'+file.name+'</span><small>'+formatSz(file.size)+'</small>';
+  box.innerHTML = '<i class="fa-solid fa-circle-check" style="font-size:32px;color:var(--green);margin-bottom:8px;"></i><span style="font-size:13px;font-weight:600;color:var(--green);">'+file.name+'</span><small style="color:var(--muted);">'+formatSz(file.size)+'</small>';
   box.parentElement.classList.add('has-file');
 }
 
@@ -639,8 +649,11 @@ function apPreviewSelfie() {
   if (!file) return;
   var reader = new FileReader();
   reader.onload = function(e) {
-    document.getElementById('apSelfiePreview').innerHTML = '<img src="'+e.target.result+'" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;" /><div style="font-size:12px;color:var(--green);font-weight:600;padding:6px;text-align:center;"><i class="fa-solid fa-circle-check"></i> '+file.name+'</div>';
-    document.getElementById('apSelfiePreview').parentElement.classList.add('has-file');
+    var wrap = document.getElementById('apSelfiePreview').parentElement;
+    document.getElementById('apSelfiePreview').innerHTML =
+      '<img src="'+e.target.result+'" style="width:130px;height:160px;object-fit:cover;border-radius:50%;border:3px solid #63b3ed;" />' +
+      '<div style="font-size:12px;color:#63b3ed;font-weight:600;margin-top:8px;"><i class="fa-solid fa-circle-check"></i> '+file.name+'</div>';
+    wrap.style.background = '#0f0f1a';
   };
   reader.readAsDataURL(file);
 }
@@ -670,9 +683,11 @@ async function submitApply() {
   var dob   = document.getElementById('ap_dob').value;
   var cover = document.getElementById('ap_cover').value.trim();
 
+  var cvFile     = document.getElementById('apCvFile').files[0];
   var idFile     = document.getElementById('apIdFile').files[0];
   var selfieFile = document.getElementById('apSelfie').files[0];
 
+  var cvData     = cvFile     ? await toBase64(cvFile)     : null;
   var idData     = idFile     ? await toBase64(idFile)     : null;
   var selfieData = selfieFile ? await toBase64(selfieFile) : null;
 
@@ -680,6 +695,7 @@ async function submitApply() {
     firstName: fn, lastName: ln, email: em, phone: ph,
     city: city, postalCode: post, address: addr, birthDate: dob,
     coverLetter: cover,
+    hasCv:      !!cvData,     cvFileData: cvData,     cvFileName:   cvFile     ? cvFile.name     : null,
     hasId:      !!idData,     idFileData: idData,     idFileName:   idFile     ? idFile.name     : null,
     hasSelfie:  !!selfieData, selfieData: selfieData, selfieName:   selfieFile ? selfieFile.name : null,
   };
