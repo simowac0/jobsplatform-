@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Details – JobsPlatform</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="job.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon"><i class="fa-solid fa-briefcase"></i></span>
+        <span class="logo-text">Jobs<strong>Platform</strong></span>
+      </a>
+      <nav class="nav-links">
+        <a href="jobs.html" data-t="nav_jobs">Jobs</a>
+        <a href="jobs.html?tab=companies" data-t="nav_companies">Companies</a>
+      </nav>
+      <div class="nav-right">
+        <span class="lang-btn"><i class="fa-solid fa-globe lang-globe"></i><span class="lang-code">GB</span><span class="lang-label">EN</span><i class="fa-solid fa-chevron-down lang-caret"></i></span>
+        <div class="nav-auth-zone" style="display:flex;align-items:center;gap:10px;">
+          <a href="login.html" class="btn-ghost" data-t="nav_signin">Sign In</a>
+          <a href="login.html?tab=register&role=employer" class="btn-primary" data-t="nav_post">Post a Job</a>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburger"><i class="fa-solid fa-bars"></i></button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="jobs.html">Jobs</a>
+      <a href="login.html">Sign In</a>
+    </div>
+  </header>
+
+  <!-- JOB DETAIL VIEW -->
+  <div id="jobDetailView">
+    <div class="jd-container container">
+
+      <a href="jobs.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to jobs</a>
+
+      <div class="jd-layout">
+
+        <!-- MAIN COLUMN -->
+        <div class="jd-main">
+
+          <!-- Header card -->
+          <div class="jd-card jd-header-card" id="jdHeaderCard">
+            <div class="jd-header-top">
+              <div class="jd-logo" id="jdLogo">JP</div>
+              <div class="jd-header-info">
+                <div class="jd-tags" id="jdTags">
+                  <span class="jd-tag blue" id="jdType">Full-time</span>
+                  <span class="jd-tag green" id="jdMode">On-site</span>
+                  <span class="jd-tag purple" id="jdCategory">IT</span>
+                  <span class="jd-tag gold" id="jdFeatured" style="display:none;">Featured</span>
+                </div>
+                <h1 class="jd-title" id="jdTitle">Loading...</h1>
+                <div class="jd-company" id="jdCompany">
+                  <i class="fa-solid fa-building"></i> <span id="jdCompanyName">Company</span>
+                </div>
+              </div>
+              <div class="jd-star-badge" id="jdStarBadge"><i class="fa-solid fa-star"></i></div>
+            </div>
+
+            <div class="jd-divider"></div>
+
+            <div class="jd-meta">
+              <div class="jd-meta-item">
+                <i class="fa-solid fa-location-dot"></i>
+                <span id="jdLocation">Location</span>
+              </div>
+              <div class="jd-meta-item salary">
+                <i class="fa-solid fa-sterling-sign"></i>
+                <span id="jdSalary">Salary</span>
+              </div>
+              <div class="jd-meta-item">
+                <i class="fa-regular fa-clock"></i>
+                <span id="jdPosted">Published</span>
+              </div>
+            </div>
+
+            <div class="jd-perks">
+              <span class="jd-perk green"><i class="fa-solid fa-bolt"></i> Easy Apply</span>
+              <span class="jd-perk blue"><i class="fa-solid fa-graduation-cap"></i> Training Provided</span>
+              <span class="jd-perk gray"><i class="fa-solid fa-user-check"></i> No Degree Required</span>
+              <span class="jd-perk orange"><i class="fa-solid fa-sterling-sign"></i> Salary Shown</span>
+            </div>
+          </div>
+
+          <!-- About the company -->
+          <div class="jd-card">
+            <div class="jd-section-title">
+              <i class="fa-solid fa-building" style="color:#2563eb;"></i> About <span id="jdAboutCompanyName">the Company</span>
+            </div>
+            <p id="jdAbout" style="color:var(--muted);line-height:1.8;font-size:15px;"></p>
+            <div class="jd-company-stats" id="jdCompanyStats"></div>
+          </div>
+
+          <!-- Contract details -->
+          <div class="jd-card">
+            <div class="jd-section-title">
+              <i class="fa-solid fa-file-contract" style="color:#7c3aed;"></i> Contract &amp; Hours
+            </div>
+            <div class="jd-contract-grid" id="jdContractGrid"></div>
+          </div>
+
+          <!-- Description card -->
+          <div class="jd-card">
+            <div class="jd-section-title">
+              <i class="fa-regular fa-file-lines" style="color:#f97316;"></i> Job Description
+            </div>
+            <div id="jdDesc"></div>
+          </div>
+
+          <!-- Requirements card -->
+          <div class="jd-card">
+            <div class="jd-section-title">
+              <i class="fa-solid fa-circle-check" style="color:#16a34a;"></i> Requirements
+            </div>
+            <ul class="jd-list" id="jdRequirements"></ul>
+          </div>
+
+          <!-- What we're looking for -->
+          <div class="jd-card">
+            <div class="jd-section-title">
+              <i class="fa-solid fa-star" style="color:#f97316;"></i> What We're Looking For
+            </div>
+            <p id="jdLookingFor" style="color:var(--muted);line-height:1.8;font-size:15px;margin-bottom:16px;"></p>
+            <div class="jd-skills-wrap" id="jdSkills"></div>
+          </div>
+
+          <!-- Benefits card -->
+          <div class="jd-card">
+            <div class="jd-section-title">
+              <i class="fa-regular fa-calendar-check" style="color:#2563eb;"></i> Benefits &amp; Perks
+            </div>
+            <div class="jd-benefits-grid" id="jdBenefits"></div>
+          </div>
+
+          <div style="text-align:center;padding:32px 0;font-size:14px;color:var(--muted);">
+            Built with care for better hiring
+          </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <aside class="jd-sidebar">
+
+          <!-- Apply card -->
+          <div class="jd-card jd-apply-card">
+            <button class="btn-dark-pill" style="width:100%;margin-bottom:12px;" onclick="startApply()">
+              <i class="fa-solid fa-paper-plane"></i> Apply now
+            </button>
+            <p style="text-align:center;font-size:13px;color:var(--muted);">Quick application – 5 minutes maximum</p>
+          </div>
+
+          <!-- Need help card -->
+          <div class="jd-card jd-help-card">
+            <h4 style="font-weight:700;margin-bottom:6px;">Need help?</h4>
+            <p style="font-size:14px;color:var(--muted);">Our team is available to assist you with your application.</p>
+          </div>
+
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLY FORM VIEW -->
+  <div id="applyFormView" style="display:none;">
+    <div class="jd-container container">
+
+      <a href="#" onclick="showDetailView();return false;" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to job</a>
+
+      <div class="jd-layout">
+
+        <!-- FORM -->
+        <div class="jd-main">
+          <div class="jd-card" style="position:relative;">
+            <div class="jd-star-badge" style="background:#2563eb;"><i class="fa-solid fa-paper-plane"></i></div>
+
+            <!-- Quick apply badge -->
+            <div class="quick-apply-badge"><i class="fa-solid fa-bolt"></i> Quick apply</div>
+
+            <h2 style="font-size:24px;font-weight:800;margin-bottom:8px;">Apply to this position</h2>
+            <p style="font-size:14px;color:var(--muted);margin-bottom:28px;">Complete the steps below to submit your application. ID verification is required.</p>
+
+            <!-- Steps -->
+            <div class="apply-steps">
+              <div class="apply-step-item active" id="astep1">
+                <div class="apply-step-circle active">1</div>
+                <span>Personal Info</span>
+              </div>
+              <div class="apply-step-line" id="aline1"></div>
+              <div class="apply-step-item" id="astep2">
+                <div class="apply-step-circle">2</div>
+                <span>ID Verification</span>
+              </div>
+              <div class="apply-step-line" id="aline2"></div>
+              <div class="apply-step-item" id="astep3">
+                <div class="apply-step-circle">3</div>
+                <span>Review</span>
+              </div>
+            </div>
+
+            <!-- STEP 1: Personal Info -->
+            <div id="applyStep1">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>First name <span style="color:#f97316;">*</span></label>
+                  <div class="input-wrap input-cream"><i class="fa-regular fa-user"></i>
+                    <input type="text" id="ap_fn" placeholder="John" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Last name <span style="color:#f97316;">*</span></label>
+                  <div class="input-wrap input-cream"><i class="fa-regular fa-user"></i>
+                    <input type="text" id="ap_ln" placeholder="Doe" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Email <span style="color:#f97316;">*</span></label>
+                  <div class="input-wrap input-cream"><i class="fa-regular fa-envelope"></i>
+                    <input type="email" id="ap_em" placeholder="john@example.com" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Phone <span style="color:#f97316;">*</span></label>
+                  <div class="input-wrap input-cream"><i class="fa-solid fa-phone"></i>
+                    <input type="tel" id="ap_ph" placeholder="+44 7700 900123" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>City <span style="color:#f97316;">*</span></label>
+                  <div class="input-wrap input-cream"><i class="fa-solid fa-location-dot"></i>
+                    <input type="text" id="ap_city" placeholder="London" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Postal code <span style="color:#f97316;">*</span></label>
+                  <div class="input-wrap input-cream"><i class="fa-solid fa-map-pin"></i>
+                    <input type="text" id="ap_post" placeholder="SW1A 1AA" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Address <span style="color:#f97316;">*</span></label>
+                <div class="input-wrap input-cream"><i class="fa-solid fa-house"></i>
+                  <input type="text" id="ap_addr" placeholder="123 Main Street" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Birth date</label>
+                <div class="input-wrap input-cream"><i class="fa-regular fa-calendar"></i>
+                  <input type="date" id="ap_dob" placeholder="dd/mm/yyyy" />
+                </div>
+              </div>
+              <div class="form-msg" id="applyMsg1"></div>
+              <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+                <button class="btn-dark-pill" style="width:auto;padding:14px 32px;" onclick="applyStep2()">
+                  Continue <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 2: ID Verification -->
+            <div id="applyStep2" style="display:none;">
+              <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">Identity Document</h3>
+              <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Upload a valid photo ID. Your data is encrypted and never shared.</p>
+
+              <div class="id-type-toggle" style="margin-bottom:20px;">
+                <button class="id-btn active" id="apIdNational" onclick="apSelectId('national')"><i class="fa-solid fa-id-card"></i> National ID</button>
+                <button class="id-btn" id="apIdPassport" onclick="apSelectId('passport')"><i class="fa-solid fa-passport"></i> Passport</button>
+              </div>
+
+              <div class="upload-group">
+                <label class="upload-label"><i class="fa-solid fa-id-card"></i> <span id="apIdLabel">National ID Card</span><span class="upload-optional">Front side</span></label>
+                <div class="upload-box" onclick="document.getElementById('apIdFile').click()">
+                  <div class="upload-box-inner" id="apIdPreview">
+                    <i class="fa-solid fa-id-card"></i>
+                    <span>Click to upload document</span>
+                    <small>JPG, PNG, PDF · Max 10MB</small>
+                  </div>
+                </div>
+                <input type="file" id="apIdFile" accept="image/*,.pdf" style="display:none;" onchange="apPreviewId()" />
+              </div>
+
+              <!-- Selfie -->
+              <div class="upload-group">
+                <label class="upload-label"><i class="fa-solid fa-camera"></i> Verification Selfie<span class="upload-optional">Optional</span></label>
+                <div class="upload-box" onclick="document.getElementById('apSelfie').click()">
+                  <div class="upload-box-inner" id="apSelfiePreview">
+                    <i class="fa-solid fa-camera-retro"></i>
+                    <span>Upload a clear selfie photo</span>
+                    <small>JPG, PNG · Max 5MB</small>
+                  </div>
+                </div>
+                <input type="file" id="apSelfie" accept="image/*" style="display:none;" onchange="apPreviewSelfie()" />
+              </div>
+
+              <div class="upload-note" style="margin-bottom:20px;">
+                <i class="fa-solid fa-shield-halved"></i>
+                Your documents are encrypted and only used for identity verification.
+              </div>
+
+              <div class="form-msg" id="applyMsg2"></div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;">
+                <button class="btn-ghost" style="padding:12px 24px;" onclick="applyGoStep(1)">← Back</button>
+                <button class="btn-dark-pill" style="width:auto;padding:14px 32px;" onclick="applyStep3()">Continue →</button>
+              </div>
+            </div>
+
+            <!-- STEP 3: Review & Submit -->
+            <div id="applyStep3" style="display:none;">
+              <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">Review your application</h3>
+              <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Check your details before submitting.</p>
+
+              <div class="review-card" id="reviewData"></div>
+
+              <div class="form-group" style="margin-top:20px;">
+                <label>Cover Letter <span style="font-weight:400;color:var(--muted);">(optional)</span></label>
+                <textarea id="ap_cover" placeholder="Tell the employer why you are a great fit..." style="width:100%;padding:13px;border:1.5px solid var(--border);border-radius:12px;font-family:inherit;font-size:14px;resize:vertical;min-height:100px;outline:none;color:var(--dark);background:#f7f1e8;"></textarea>
+              </div>
+
+              <div class="form-msg" id="applyMsg3"></div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+                <button class="btn-ghost" style="padding:12px 24px;" onclick="applyGoStep(2)">← Back</button>
+                <button class="btn-dark-pill" style="width:auto;padding:14px 32px;" onclick="submitApply()" id="submitApplyBtn">
+                  <span id="submitApplyTxt">Submit Application <i class="fa-solid fa-paper-plane"></i></span>
+                  <span id="submitApplySpin" style="display:none;"><i class="fa-solid fa-spinner fa-spin"></i></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- SUCCESS -->
+            <div id="applySuccess" style="display:none;text-align:center;padding:40px 0;">
+              <div style="font-size:64px;color:var(--green);margin-bottom:16px;"><i class="fa-solid fa-circle-check"></i></div>
+              <h3 style="font-size:22px;font-weight:800;margin-bottom:8px;">Application Submitted!</h3>
+              <p style="color:var(--muted);margin-bottom:24px;">The employer will respond within <strong>48 hours</strong>. Good luck!</p>
+              <a href="jobs.html" class="btn-dark-pill" style="display:inline-flex;justify-content:center;padding:14px 32px;">Browse More Jobs</a>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- APPLY SIDEBAR -->
+        <aside class="jd-sidebar">
+          <div class="jd-card">
+            <div class="jd-id-title" style="color:var(--blue);"><i class="fa-solid fa-briefcase"></i> Job details</div>
+            <div style="display:flex;align-items:center;gap:12px;margin:14px 0 16px;">
+              <div class="jd-logo-sm" id="apSidebarLogo">JP</div>
+              <div>
+                <div style="font-weight:700;font-size:15px;" id="apSidebarTitle">Job Title</div>
+                <div style="font-size:13px;color:var(--muted);"><i class="fa-solid fa-building" style="font-size:11px;"></i> <span id="apSidebarCompany">Company</span></div>
+                <div style="font-size:13px;color:var(--muted);"><i class="fa-solid fa-location-dot" style="font-size:11px;"></i> <span id="apSidebarLocation">Location</span></div>
+              </div>
+            </div>
+            <div class="jd-detail-row"><span>Contract</span><strong id="apSidebarType">—</strong></div>
+            <div class="jd-detail-row"><span>Salary</span><strong id="apSidebarSalary">—</strong></div>
+          </div>
+          <div class="jd-card" style="background:#e0f7f4;border-color:#99e6de;">
+            <p style="font-size:14px;color:#0e7490;font-weight:500;"><i class="fa-solid fa-circle-check" style="color:#16a34a;margin-right:6px;"></i> Good to know: This company typically responds within <strong>48 hours</strong>.</p>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Apply Bar -->
+  <div class="sticky-apply-bar" id="stickyApplyBar">
+    <div class="sticky-apply-inner">
+      <div class="sticky-job-info">
+        <div class="sticky-logo" id="stickyLogo">JP</div>
+        <div>
+          <div class="sticky-title" id="stickyTitle">Loading...</div>
+          <div class="sticky-company" id="stickyCompany">Company</div>
+        </div>
+      </div>
+      <div class="sticky-right">
+        <div class="sticky-salary" id="stickySalary">—</div>
+        <button class="btn-dark-pill sticky-btn" onclick="startApply()">
+          <i class="fa-solid fa-paper-plane"></i> Apply now
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="webhook.js"></script>
+  <script src="main.js"></script>
+  <script src="jobs-engine.js"></script>
+  <script src="job.js"></script>
+</body>
+</html>

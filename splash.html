@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JobsPlatform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #1a2035;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Animated background circles */
+    .bg-circle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.12;
+      animation: float 8s ease-in-out infinite;
+    }
+    .bg-circle.c1 { width:600px; height:600px; background:#f97316; top:-200px; right:-200px; animation-delay:0s; }
+    .bg-circle.c2 { width:400px; height:400px; background:#f97316; bottom:-150px; left:-100px; animation-delay:3s; }
+    .bg-circle.c3 { width:200px; height:200px; background:#fff; top:50%; left:10%; animation-delay:1.5s; }
+
+    @keyframes float {
+      0%,100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+
+    /* Card */
+    .splash-card {
+      position: relative;
+      z-index: 10;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
+      padding: 56px 48px;
+      max-width: 480px;
+      width: 90%;
+      text-align: center;
+      animation: cardIn .8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes cardIn {
+      from { opacity:0; transform: translateY(40px) scale(0.96); }
+      to   { opacity:1; transform: translateY(0)  scale(1); }
+    }
+
+    /* Logo */
+    .splash-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .splash-logo-icon {
+      width: 56px;
+      height: 56px;
+      background: #f97316;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(249,115,22,0.4);
+    }
+    .splash-logo-text {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .splash-logo-text strong { color: #f97316; }
+
+    /* Tagline */
+    .splash-tagline {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #f97316;
+      background: rgba(249,115,22,0.12);
+      border: 1px solid rgba(249,115,22,0.3);
+      padding: 6px 16px;
+      border-radius: 100px;
+      display: inline-block;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    h1 span { color: #f97316; }
+
+    p {
+      font-size: 16px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    /* Main action buttons */
+    .splash-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .btn-enter {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 28px;
+      border-radius: 100px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+      transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    .btn-enter:hover { transform: translateY(-2px); }
+
+    .btn-jobs {
+      background: #f97316;
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(249,115,22,0.4);
+    }
+    .btn-jobs:hover { background: #ea580c; box-shadow: 0 12px 32px rgba(249,115,22,0.5); }
+
+    .btn-register {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border: 1.5px solid rgba(255,255,255,0.2);
+    }
+    .btn-register:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.4); }
+
+    /* Divider */
+    .splash-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      color: rgba(255,255,255,0.3);
+      font-size: 13px;
+    }
+    .splash-divider::before, .splash-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.12);
+    }
+
+    /* Social buttons */
+    .social-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-social {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      transition: all .2s;
+    }
+    .btn-social:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.35); }
+
+    .btn-linkedin {
+      border-color: rgba(0,119,181,0.5);
+      background: rgba(0,119,181,0.12);
+    }
+    .btn-linkedin:hover { background: rgba(0,119,181,0.25); border-color: #0077b5; box-shadow: 0 6px 20px rgba(0,119,181,0.3); }
+    .btn-linkedin i { color: #0a66c2; font-size: 18px; }
+
+    .btn-facebook {
+      border-color: rgba(24,119,242,0.5);
+      background: rgba(24,119,242,0.12);
+    }
+    .btn-facebook:hover { background: rgba(24,119,242,0.25); border-color: #1877f2; box-shadow: 0 6px 20px rgba(24,119,242,0.3); }
+    .btn-facebook i { color: #1877f2; font-size: 18px; }
+
+    /* Stats row */
+    .splash-stats {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .splash-stat { text-align: center; }
+    .splash-stat strong { display: block; font-size: 22px; font-weight: 800; color: #fff; }
+    .splash-stat span   { font-size: 12px; color: rgba(255,255,255,0.5); }
+
+    /* Auto-redirect progress bar */
+    .progress-bar {
+      position: fixed;
+      bottom: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #f97316, #ea580c);
+      width: 0%;
+      transition: width linear;
+      z-index: 100;
+    }
+
+    @media (max-width: 480px) {
+      .splash-card { padding: 40px 24px; }
+      .splash-stats { gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-circle c1"></div>
+  <div class="bg-circle c2"></div>
+  <div class="bg-circle c3"></div>
+
+  <div class="splash-card">
+
+    <div class="splash-logo">
+      <div class="splash-logo-icon"><i class="fa-solid fa-briefcase"></i></div>
+      <div class="splash-logo-text">Jobs<strong>Platform</strong></div>
+    </div>
+
+    <div class="splash-tagline">🇬🇧 UK's #1 Verified Job Board</div>
+
+    <h1>Find a Job That<br><span>Actually Responds</span></h1>
+    <p>No ghost jobs. No hidden salaries. Real employers who reply within 48 hours — guaranteed.</p>
+
+    <div class="splash-actions">
+      <a href="jobs.html" class="btn-enter btn-jobs">
+        <i class="fa-solid fa-magnifying-glass"></i> Browse Verified Jobs
+      </a>
+      <a href="login.html?tab=register" class="btn-enter btn-register">
+        <i class="fa-regular fa-user"></i> Create Free Account
+      </a>
+    </div>
+
+    <div class="splash-divider">or continue with</div>
+
+    <div class="social-actions">
+      <a href="https://www.linkedin.com" target="_blank" class="btn-social btn-linkedin">
+        <i class="fa-brands fa-linkedin"></i> LinkedIn
+      </a>
+      <a href="https://www.facebook.com" target="_blank" class="btn-social btn-facebook">
+        <i class="fa-brands fa-facebook"></i> Facebook
+      </a>
+    </div>
+
+    <div class="splash-stats">
+      <div class="splash-stat"><strong>12,847</strong><span>Jobs this week</span></div>
+      <div class="splash-stat"><strong>50k+</strong><span>Active users</span></div>
+      <div class="splash-stat"><strong>94%</strong><span>Satisfaction</span></div>
+    </div>
+
+  </div>
+
+  <div class="progress-bar" id="progressBar"></div>
+
+  <script>
+    // Smooth progress bar then redirect to home
+    const bar = document.getElementById('progressBar');
+    let start = null;
+    const duration = 4000;
+
+    function animate(ts) {
+      if (!start) start = ts;
+      const pct = Math.min(((ts - start) / duration) * 100, 100);
+      bar.style.width = pct + '%';
+      if (pct < 100) requestAnimationFrame(animate);
+      else window.location.href = 'index.html';
+    }
+
+    // Only auto-redirect if user hasn't clicked anything
+    let userActed = false;
+    document.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => { userActed = true; });
+    });
+
+    setTimeout(() => {
+      if (!userActed) requestAnimationFrame(animate);
+    }, 800);
+  </script>
+</body>
+</html>
