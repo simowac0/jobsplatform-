@@ -968,8 +968,15 @@ img { max-width: 100%; }
 
 @media (max-width: 768px) {
   .nav-links { display: none; }
-  .nav-right { display: flex; }
+  .nav-right { display: flex; align-items: center; gap: 8px; }
   .nav-right .btn-primary { display: none; }
+  .nav-right .btn-ghost {
+    padding: 8px 14px;
+    font-size: 13px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    font-weight: 600;
+  }
   .hamburger { display: flex; }
 
   .hero-inner { grid-template-columns: 1fr; gap: 48px; }
