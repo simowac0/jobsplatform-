@@ -34,8 +34,13 @@ window.WEBHOOK_URL = '';
           localStorage.setItem('jp_user', JSON.stringify(user));
           // Clean URL hash
           history.replaceState(null, '', window.location.pathname + window.location.search);
-          // Refresh navbar if updateNavAuth exists
-          if (typeof updateNavAuth === 'function') updateNavAuth();
+          // Refresh navbar after scripts loaded
+          window.addEventListener('DOMContentLoaded', function() {
+            if (typeof updateNavAuth === 'function') updateNavAuth();
+          });
+          if (document.readyState !== 'loading') {
+            if (typeof updateNavAuth === 'function') updateNavAuth();
+          }
         }
       }
     } else {
