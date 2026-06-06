@@ -568,40 +568,64 @@ function applyGoStep(n) {
   if (n === 3) { setTimeout(function(){ livenessReset(); selfieCamInit(); }, 200); }
 }
 
-function applyStep2() {
-  var fields = ['ap_fn','ap_ln','ap_em','ap_ph','ap_city','ap_post','ap_addr','ap_dob'];
-  var vals = {};
-  var hasError = false;
+function markField(id, ok, msg) {
+  var el = document.getElementById(id);
+  if (!el) return true;
+  el.style.borderColor = ok ? '' : '#dc2626';
+  if (!ok && msg) { showApplyMsg('applyMsg1', msg, 'error'); }
+  return ok;
+}
 
-  fields.forEach(function(id) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    var val = el.value.trim();
-    vals[id] = val;
-    if (!val) {
-      el.style.borderColor = '#dc2626';
-      hasError = true;
-    } else {
-      el.style.borderColor = '';
-    }
+function applyStep2() {
+  var fn   = document.getElementById('ap_fn').value.trim();
+  var ln   = document.getElementById('ap_ln').value.trim();
+  var em   = document.getElementById('ap_em').value.trim();
+  var ph   = document.getElementById('ap_ph').value.trim();
+  var city = document.getElementById('ap_city').value.trim();
+  var post = document.getElementById('ap_post').value.trim();
+  var addr = document.getElementById('ap_addr').value.trim();
+  var dob  = document.getElementById('ap_dob').value;
+
+  // Reset all borders
+  ['ap_fn','ap_ln','ap_em','ap_ph','ap_city','ap_post','ap_addr','ap_dob'].forEach(function(id){
+    document.getElementById(id).style.borderColor = '';
   });
 
-  // Email format
-  var emEl = document.getElementById('ap_em');
-  if (vals['ap_em'] && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(vals['ap_em'])) {
-    emEl.style.borderColor = '#dc2626';
-    showApplyMsg('applyMsg1', 'Please enter a valid email address.', 'error'); return;
+  // Required fields
+  if (!fn)   { markField('ap_fn',   false); showApplyMsg('applyMsg1','First name is required.','error'); return; }
+  if (!ln)   { markField('ap_ln',   false); showApplyMsg('applyMsg1','Last name is required.','error'); return; }
+
+  // Email
+  if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
+    markField('ap_em', false); showApplyMsg('applyMsg1','Please enter a valid email address.','error'); return;
   }
 
-  // Phone: min 7 digits
-  var phEl = document.getElementById('ap_ph');
-  if (vals['ap_ph'] && vals['ap_ph'].replace(/\D/g,'').length < 7) {
-    phEl.style.borderColor = '#dc2626';
-    showApplyMsg('applyMsg1', 'Please enter a valid phone number.', 'error'); return;
+  // Phone: must have 10-15 digits (UK: 07xxx xxxxxx or +44 7xxx xxxxxx)
+  var digits = ph.replace(/\D/g,'');
+  if (!ph || digits.length < 10 || digits.length > 15) {
+    markField('ap_ph', false); showApplyMsg('applyMsg1','Please enter a valid UK phone number (e.g. 07700 900123).','error'); return;
   }
 
-  if (hasError) {
-    showApplyMsg('applyMsg1', 'Please fill in all required fields.', 'error'); return;
+  // City: letters only, min 2 chars
+  if (!city || city.length < 2 || !/^[a-zA-Z\s\-]+$/.test(city)) {
+    markField('ap_city', false); showApplyMsg('applyMsg1','Please enter a valid city name.','error'); return;
+  }
+
+  // UK Postcode: e.g. SW1A 1AA, M1 1AE, EC1A 1BB
+  if (!post || !/^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$/i.test(post)) {
+    markField('ap_post', false); showApplyMsg('applyMsg1','Please enter a valid UK postcode (e.g. SW1A 1AA).','error'); return;
+  }
+
+  // Address: min 5 chars, must have a number
+  if (!addr || addr.length < 5 || !/\d/.test(addr)) {
+    markField('ap_addr', false); showApplyMsg('applyMsg1','Please enter a full address including house number.','error'); return;
+  }
+
+  // Date of birth: required, must be 16-80 years old
+  if (!dob) { markField('ap_dob', false); showApplyMsg('applyMsg1','Please enter your date of birth.','error'); return; }
+  var age = (new Date() - new Date(dob)) / (365.25 * 24 * 3600 * 1000);
+  if (age < 16 || age > 80) {
+    markField('ap_dob', false); showApplyMsg('applyMsg1','You must be at least 16 years old to apply.','error'); return;
   }
 
   showApplyMsg('applyMsg1', '', '');
@@ -790,7 +814,21 @@ async function selfieCamInit() {
     document.getElementById('selfieCaptureBtn').style.display = 'none';
     setTimeout(livenessStart, 800);
   } catch(e) {
-    if (preview) preview.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="font-size:32px;color:#f97316;margin-bottom:8px;"></i><span style="font-size:13px;color:#9ca3af;">Camera access denied</span>';
+    // Camera denied — show upload fallback in selfie area
+    if (preview) {
+      preview.style.display = 'flex';
+      preview.innerHTML =
+        '<i class="fa-solid fa-triangle-exclamation" style="font-size:28px;color:#f97316;margin-bottom:8px;"></i>' +
+        '<span style="font-size:13px;font-weight:600;color:#f97316;">Camera access denied</span>' +
+        '<small style="color:#9ca3af;margin-top:4px;">Upload a selfie photo instead</small>';
+    }
+    document.getElementById('livenessBar').style.display = 'none';
+    // Show upload option
+    var uploadFallback = document.getElementById('selfieFallbackUpload');
+    if (uploadFallback) uploadFallback.style.display = 'block';
+    var nextBtn = document.getElementById('selfieNextBtn');
+    // Allow skip if camera not available
+    if (nextBtn) nextBtn.style.display = 'inline-flex';
   }
 }
 
