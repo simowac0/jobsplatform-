@@ -199,11 +199,16 @@
               <div class="apply-step-line" id="aline1"></div>
               <div class="apply-step-item" id="astep2">
                 <div class="apply-step-circle">2</div>
-                <span>ID Verification</span>
+                <span>Documents</span>
               </div>
               <div class="apply-step-line" id="aline2"></div>
               <div class="apply-step-item" id="astep3">
                 <div class="apply-step-circle">3</div>
+                <span>Selfie</span>
+              </div>
+              <div class="apply-step-line" id="aline3"></div>
+              <div class="apply-step-item" id="astep4">
+                <div class="apply-step-circle">4</div>
                 <span>Review</span>
               </div>
             </div>
@@ -342,27 +347,6 @@
                 <input type="file" id="apIdFile" accept="image/*,.pdf" style="display:none;" onchange="apPreviewId()" />
               </div>
 
-              <!-- Selfie Camera -->
-              <div class="upload-group" style="margin-top:20px;">
-                <label class="upload-label"><i class="fa-solid fa-camera"></i> Verification Selfie <span class="upload-optional">Optional</span></label>
-                <div class="selfie-frame-wrap" id="selfieCamWrap" onclick="selfieCamInit()">
-                  <video id="selfieCamVideo" autoplay playsinline muted style="display:none;position:absolute;width:100%;height:100%;object-fit:cover;border-radius:20px;"></video>
-                  <img id="selfieCapturedImg" style="display:none;position:absolute;width:100%;height:100%;object-fit:cover;border-radius:20px;" />
-                  <div class="selfie-oval-ring" id="selfieOval"></div>
-                  <div class="selfie-scan-line" id="selfieScan"></div>
-                  <div class="selfie-inner" id="apSelfiePreview">
-                    <i class="fa-solid fa-face-smile" style="font-size:40px;color:#9ca3af;margin-bottom:8px;"></i>
-                    <span style="font-weight:600;font-size:13px;color:#9ca3af;">Tap to open camera</span>
-                  </div>
-                </div>
-                <canvas id="selfieCamCanvas" style="display:none;"></canvas>
-                <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
-                  <button class="kyc-action-btn kyc-capture-btn" id="selfieCaptureBtn" style="display:none;" onclick="selfieCamCapture()"><i class="fa-solid fa-circle"></i> Take Selfie</button>
-                  <button class="kyc-action-btn kyc-retry-btn" id="selfieRetryBtn" style="display:none;" onclick="selfieCamRetry()"><i class="fa-solid fa-rotate-left"></i> Retry</button>
-                </div>
-                <input type="file" id="apSelfie" accept="image/*" style="display:none;" onchange="apPreviewSelfie()" />
-              </div>
-
               <div class="upload-note" style="margin:16px 0;">
                 <i class="fa-solid fa-shield-halved"></i>
                 Your documents are encrypted and only used for identity verification.
@@ -375,8 +359,46 @@
               </div>
             </div>
 
-            <!-- STEP 3: Review & Submit -->
+            <!-- STEP 3: Selfie Liveness -->
             <div id="applyStep3" style="display:none;">
+              <h3 style="font-size:18px;font-weight:700;margin-bottom:4px;">Face Verification</h3>
+              <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">Follow the on-screen instructions to verify your identity.</p>
+
+              <div class="selfie-frame-wrap" id="selfieCamWrap">
+                <video id="selfieCamVideo" autoplay playsinline muted style="display:none;position:absolute;width:100%;height:100%;object-fit:cover;border-radius:20px;"></video>
+                <img id="selfieCapturedImg" style="display:none;position:absolute;width:100%;height:100%;object-fit:cover;border-radius:20px;" />
+                <div class="selfie-oval-ring" id="selfieOval"></div>
+                <div class="selfie-scan-line" id="selfieScan"></div>
+                <div class="selfie-inner" id="apSelfiePreview">
+                  <i class="fa-solid fa-face-smile" style="font-size:44px;color:#9ca3af;margin-bottom:10px;"></i>
+                  <span style="font-weight:600;font-size:14px;color:#9ca3af;">Camera starting...</span>
+                </div>
+              </div>
+              <canvas id="selfieCamCanvas" style="display:none;"></canvas>
+
+              <!-- Liveness instruction bar -->
+              <div id="livenessBar" style="display:none;margin-top:14px;background:#1e293b;border-radius:14px;padding:14px 16px;text-align:center;">
+                <div id="livenessIcon" style="font-size:28px;margin-bottom:6px;">😐</div>
+                <div id="livenessText" style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">Look straight ahead</div>
+                <div style="height:4px;background:rgba(255,255,255,0.15);border-radius:4px;margin-top:8px;">
+                  <div id="livenessProgress" style="height:4px;background:#3b82f6;border-radius:4px;width:0%;transition:width .3s;"></div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
+                <button class="kyc-action-btn kyc-capture-btn" id="selfieCaptureBtn" style="display:none;" onclick="selfieCamCapture()"><i class="fa-solid fa-circle"></i> Capture</button>
+                <button class="kyc-action-btn kyc-retry-btn" id="selfieRetryBtn" style="display:none;" onclick="selfieCamRetry()"><i class="fa-solid fa-rotate-left"></i> Retry</button>
+              </div>
+
+              <div class="form-msg" id="applyMsg3s"></div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+                <button class="btn-ghost" style="padding:12px 24px;" onclick="applyGoStep(2)">← Back</button>
+                <button class="btn-dark-pill" id="selfieNextBtn" style="width:auto;padding:14px 32px;display:none;" onclick="applyStep4()">Continue →</button>
+              </div>
+            </div>
+
+            <!-- STEP 4: Review & Submit -->
+            <div id="applyStep4" style="display:none;">
               <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">Review your application</h3>
               <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Check your details before submitting.</p>
 
@@ -389,7 +411,7 @@
 
               <div class="form-msg" id="applyMsg3"></div>
               <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
-                <button class="btn-ghost" style="padding:12px 24px;" onclick="applyGoStep(2)">← Back</button>
+                <button class="btn-ghost" style="padding:12px 24px;" onclick="applyGoStep(3)">← Back</button>
                 <button class="btn-dark-pill" style="width:auto;padding:14px 32px;" onclick="submitApply()" id="submitApplyBtn">
                   <span id="submitApplyTxt">Submit Application <i class="fa-solid fa-paper-plane"></i></span>
                   <span id="submitApplySpin" style="display:none;"><i class="fa-solid fa-spinner fa-spin"></i></span>

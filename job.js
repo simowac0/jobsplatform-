@@ -549,11 +549,13 @@ function stopAllCams() {
 }
 
 function applyGoStep(n) {
-  if (n !== 2) stopAllCams();
-  for (var i=1; i<=3; i++) {
-    document.getElementById('applyStep'+i).style.display = i===n ? 'block' : 'none';
+  if (n !== 2 && n !== 3) stopAllCams();
+  for (var i = 1; i <= 4; i++) {
+    var stepEl = document.getElementById('applyStep'+i);
+    if (stepEl) stepEl.style.display = i===n ? 'block' : 'none';
     var circle = document.querySelector('#astep'+i+' .apply-step-circle');
     var label  = document.getElementById('astep'+i);
+    if (!circle || !label) continue;
     circle.classList.remove('active','done');
     label.classList.remove('active','done');
     if (i < n)      { circle.classList.add('done');   label.classList.add('done');   circle.innerHTML='<i class="fa-solid fa-check"></i>'; }
@@ -563,6 +565,7 @@ function applyGoStep(n) {
     if (line) line.classList.toggle('done', i < n);
   }
   applyCurrentStep = n;
+  if (n === 3) { setTimeout(function(){ livenessReset(); selfieCamInit(); }, 200); }
 }
 
 function applyStep2() {
@@ -612,7 +615,14 @@ function applyStep3() {
   if (!cvFile) { showApplyMsg('applyMsg2','Please upload your CV.','error'); return; }
   if (!idFile && !hasIdCam) { showApplyMsg('applyMsg2','Please provide your identity document.','error'); return; }
   showApplyMsg('applyMsg2','','');
+  applyGoStep(3);
+}
 
+function applyStep4() {
+  if (!window._selfieCapturedDataUrl) { showApplyMsg('applyMsg3s','Please complete face verification.','error'); return; }
+  showApplyMsg('applyMsg3s','','');
+  var cvFile = document.getElementById('apCvFile').files[0];
+  var idFile = document.getElementById('apIdFile').files[0];
   var rev = document.getElementById('reviewData');
   rev.innerHTML = [
     ['Name',    document.getElementById('ap_fn').value + ' ' + document.getElementById('ap_ln').value],
@@ -620,13 +630,13 @@ function applyStep3() {
     ['Phone',   document.getElementById('ap_ph').value],
     ['City',    document.getElementById('ap_city').value],
     ['Address', document.getElementById('ap_addr').value],
-    ['CV',      cvFile.name],
-    ['ID Doc',  idFile.name],
+    ['CV',      cvFile ? cvFile.name : '✓ Uploaded'],
+    ['ID Doc',  idFile ? idFile.name : '✓ Camera capture'],
+    ['Selfie',  '✓ Verified'],
   ].map(function(r){
     return '<div class="review-row"><span>'+r[0]+'</span><strong>'+r[1]+'</strong></div>';
   }).join('');
-
-  applyGoStep(3);
+  applyGoStep(4);
 }
 
 function apPreviewCv() {
@@ -709,6 +719,64 @@ function apPreviewId() {
 // ─── SELFIE CAMERA ───────────────────────────────────────────
 var selfieCamStream = null;
 
+// ─── LIVENESS CHECK ──────────────────────────────────────────
+var livenessSteps = [
+  { icon: '😐', text: 'Look straight ahead',   duration: 2000 },
+  { icon: '⬅️', text: 'Turn your head left',   duration: 2000 },
+  { icon: '➡️', text: 'Turn your head right',  duration: 2000 },
+  { icon: '😊', text: 'Smile naturally',        duration: 1800 },
+  { icon: '😉', text: 'Blink once',             duration: 1500 },
+];
+var livenessIdx = 0;
+var livenessTimer = null;
+var livenessActive = false;
+
+function livenessReset() {
+  livenessIdx = 0; livenessActive = false;
+  if (livenessTimer) { clearTimeout(livenessTimer); livenessTimer = null; }
+  var bar = document.getElementById('livenessBar');
+  if (bar) bar.style.display = 'none';
+  var prog = document.getElementById('livenessProgress');
+  if (prog) prog.style.width = '0%';
+  document.getElementById('selfieCaptureBtn').style.display = 'none';
+  document.getElementById('selfieRetryBtn').style.display   = 'none';
+  var nextBtn = document.getElementById('selfieNextBtn');
+  if (nextBtn) nextBtn.style.display = 'none';
+}
+
+function livenessStart() {
+  livenessActive = true;
+  document.getElementById('livenessBar').style.display = 'block';
+  livenessRunStep();
+}
+
+function livenessRunStep() {
+  if (livenessIdx >= livenessSteps.length) {
+    livenessComplete(); return;
+  }
+  var step = livenessSteps[livenessIdx];
+  document.getElementById('livenessIcon').textContent = step.icon;
+  document.getElementById('livenessText').textContent = step.text;
+  var prog = document.getElementById('livenessProgress');
+  prog.style.transition = 'none'; prog.style.width = '0%';
+  var pct = ((livenessIdx + 1) / livenessSteps.length * 100).toFixed(0) + '%';
+  setTimeout(function() {
+    prog.style.transition = 'width ' + (step.duration/1000) + 's linear';
+    prog.style.width = pct;
+  }, 50);
+  livenessTimer = setTimeout(function() {
+    livenessIdx++;
+    livenessRunStep();
+  }, step.duration);
+}
+
+function livenessComplete() {
+  document.getElementById('livenessIcon').textContent = '✅';
+  document.getElementById('livenessText').textContent = 'Verification complete — take your selfie';
+  document.getElementById('livenessProgress').style.width = '100%';
+  document.getElementById('selfieCaptureBtn').style.display = 'inline-flex';
+}
+
 async function selfieCamInit() {
   var video = document.getElementById('selfieCamVideo');
   if (video.style.display === 'block') return;
@@ -717,12 +785,12 @@ async function selfieCamInit() {
     selfieCamStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 720 } } });
     video.srcObject = selfieCamStream;
     video.style.display = 'block';
-    preview.style.display = 'none';
-    document.getElementById('selfieCaptureBtn').style.display = 'inline-flex';
-    document.getElementById('selfieRetryBtn').style.display   = 'none';
+    if (preview) preview.style.display = 'none';
+    document.getElementById('selfieRetryBtn').style.display = 'none';
+    document.getElementById('selfieCaptureBtn').style.display = 'none';
+    setTimeout(livenessStart, 800);
   } catch(e) {
-    preview.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="font-size:32px;color:#f97316;margin-bottom:8px;"></i><span style="font-size:13px;color:#9ca3af;">Camera denied — use file upload</span>';
-    document.getElementById('apSelfie').click();
+    if (preview) preview.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="font-size:32px;color:#f97316;margin-bottom:8px;"></i><span style="font-size:13px;color:#9ca3af;">Camera access denied</span>';
   }
 }
 
@@ -740,13 +808,16 @@ function selfieCamCapture() {
   if (selfieCamStream) { selfieCamStream.getTracks().forEach(function(t){t.stop();}); selfieCamStream = null; }
   document.getElementById('selfieCaptureBtn').style.display = 'none';
   document.getElementById('selfieRetryBtn').style.display   = 'inline-flex';
+  document.getElementById('livenessBar').style.display = 'none';
+  var nextBtn = document.getElementById('selfieNextBtn');
+  if (nextBtn) nextBtn.style.display = 'inline-flex';
   window._selfieCapturedDataUrl = dataUrl;
 }
 
 function selfieCamRetry() {
   document.getElementById('selfieCapturedImg').style.display = 'none';
   window._selfieCapturedDataUrl = null;
-  document.getElementById('selfieRetryBtn').style.display = 'none';
+  livenessReset();
   selfieCamInit();
 }
 
@@ -821,7 +892,7 @@ async function submitApply() {
 
   await new Promise(function(r){setTimeout(r,1200);});
 
-  for (var i=1; i<=3; i++) document.getElementById('applyStep'+i).style.display='none';
+  for (var i=1; i<=4; i++) { var s=document.getElementById('applyStep'+i); if(s) s.style.display='none'; }
   document.getElementById('applySuccess').style.display = 'block';
 }
 
