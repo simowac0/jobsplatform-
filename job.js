@@ -690,20 +690,33 @@ function idSetSource(src) {
 // ─── ID CAMERA ───────────────────────────────────────────────
 var idCamStream = null;
 
+function idScannerSet(label, dotActive, hint) {
+  var dot = document.getElementById('idScannerDot');
+  var lbl = document.getElementById('idScannerLabel');
+  var hnt = document.getElementById('idFrameHint');
+  if (dot) { dot.className = 'id-scanner-dot' + (dotActive ? ' active' : ''); }
+  if (lbl) lbl.textContent = label;
+  if (hnt && hint) hnt.textContent = hint;
+}
+
 async function idCamStart() {
   var video = document.getElementById('idCamVideo');
   var idle  = document.getElementById('idCamIdle');
+  var scanLine = document.getElementById('idScanLine');
   try {
     idCamStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 } } });
     video.srcObject = idCamStream;
     video.style.display = 'block';
     if (idle) idle.style.display = 'none';
+    if (scanLine) scanLine.style.display = 'block';
+    idScannerSet('SCANNING', true, 'Hold still — scanning document');
     document.getElementById('idStartBtn').style.display   = 'none';
     document.getElementById('idCaptureBtn').style.display = 'inline-flex';
     document.getElementById('idRetryBtn').style.display   = 'none';
     document.getElementById('idCamBtns').style.display    = 'flex';
   } catch(e) {
-    if (idle) idle.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="font-size:28px;color:#f97316;margin-bottom:8px;"></i><span style="font-size:13px;color:#9ca3af;">Camera not available — use Upload</span>';
+    idScannerSet('ERROR', false, 'Camera not available — use Upload');
+    if (idle) idle.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="font-size:28px;color:#f97316;margin-bottom:8px;"></i><span style="font-size:13px;color:rgba(255,255,255,0.5);">Camera not available</span>';
     idSetSource('upload');
   }
 }
@@ -712,6 +725,7 @@ function idCamCapture() {
   var video  = document.getElementById('idCamVideo');
   var canvas = document.getElementById('idCamCanvas');
   var img    = document.getElementById('idCapturedImg');
+  var scanLine = document.getElementById('idScanLine');
   canvas.width  = video.videoWidth;
   canvas.height = video.videoHeight;
   canvas.getContext('2d').drawImage(video, 0, 0);
@@ -719,7 +733,11 @@ function idCamCapture() {
   img.src = dataUrl;
   img.style.display = 'block';
   video.style.display = 'none';
+  if (scanLine) scanLine.style.display = 'none';
   if (idCamStream) { idCamStream.getTracks().forEach(function(t){t.stop();}); idCamStream = null; }
+  // Turn corners green
+  document.querySelectorAll('#idCamWrap .id-frame-corner').forEach(function(c){ c.classList.add('verified'); });
+  idScannerSet('CAPTURED', true, 'Document captured — tap Retry to redo');
   document.getElementById('idCaptureBtn').style.display = 'none';
   document.getElementById('idRetryBtn').style.display   = 'inline-flex';
   window._idCapturedDataUrl = dataUrl;
@@ -729,6 +747,8 @@ function idCamRetry() {
   document.getElementById('idCapturedImg').style.display = 'none';
   window._idCapturedDataUrl = null;
   document.getElementById('idRetryBtn').style.display   = 'none';
+  document.querySelectorAll('#idCamWrap .id-frame-corner').forEach(function(c){ c.classList.remove('verified'); });
+  idScannerSet('READY', false, 'Place your document inside the frame');
   idCamStart();
 }
 

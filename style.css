@@ -1193,32 +1193,92 @@ img { max-width: 100%; }
 .cv-upload-box.has-file { border-color: var(--green); border-style: solid; background: #f0fdf4; }
 .cv-upload-inner { display: flex; flex-direction: column; align-items: center; }
 
-/* ID card frame */
+/* ═══ ID DOCUMENT SCANNER — Cashplus KYC Style ═══ */
 .id-frame-wrap {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16/10;
-  border-radius: 14px;
-  background: #f3f4f6;
-  cursor: pointer;
+  position: relative; width: 100%; aspect-ratio: 16/10;
+  border-radius: 16px; background: #f3f4f6; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
-  transition: background .2s;
+  overflow: hidden; transition: background .2s;
 }
 .id-frame-wrap:hover { background: #e9ecf0; }
 .id-frame-wrap.has-file { background: #f0fdf4; }
-.id-frame-corner {
-  position: absolute;
-  width: 24px; height: 24px;
-  border-color: var(--blue);
-  border-style: solid;
-  border-width: 0;
-}
-.id-frame-corner.tl { top: 12px; left: 12px; border-top-width: 3px; border-left-width: 3px; border-radius: 4px 0 0 0; }
-.id-frame-corner.tr { top: 12px; right: 12px; border-top-width: 3px; border-right-width: 3px; border-radius: 0 4px 0 0; }
-.id-frame-corner.bl { bottom: 12px; left: 12px; border-bottom-width: 3px; border-left-width: 3px; border-radius: 0 0 0 4px; }
-.id-frame-corner.br { bottom: 12px; right: 12px; border-bottom-width: 3px; border-right-width: 3px; border-radius: 0 0 4px 0; }
 .id-frame-inner { display: flex; flex-direction: column; align-items: center; z-index: 1; }
+
+/* KYC camera wrap — dark document scanner */
+.kyc-cam-wrap {
+  position: relative; width: 100%; aspect-ratio: 16/10;
+  background: linear-gradient(180deg, #080c14 0%, #0d1520 100%);
+  border-radius: 16px; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.kyc-cam-wrap video { position: absolute; width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
+
+/* Status bar inside ID scanner */
+.id-scanner-status {
+  position: absolute; top: 0; left: 0; right: 0;
+  padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(180deg, rgba(8,12,20,0.92) 0%, transparent 100%);
+  z-index: 10;
+}
+.id-scanner-label {
+  font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.5);
+  letter-spacing: .1em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 6px;
+}
+.id-scanner-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #ef4444;
+  animation: rec-blink 1.2s ease-in-out infinite;
+}
+.id-scanner-dot.active { background: #22c55e; animation: none; }
+
+/* Dashed card guide rectangle */
+.id-card-guide {
+  position: absolute; width: 80%; height: 70%;
+  border-radius: 8px; z-index: 3;
+  border: 1.5px dashed rgba(0,149,255,0.35);
+}
+
+/* L-shaped corners — thick */
+.id-frame-corner {
+  position: absolute; width: 28px; height: 28px;
+  border-style: solid; border-width: 0; z-index: 5;
+  border-color: #0055A5; transition: border-color .4s;
+}
+.kyc-cam-wrap .id-frame-corner { border-color: #0099ff; filter: drop-shadow(0 0 5px rgba(0,149,255,0.7)); }
+.id-frame-corner.tl { top: 15%; left: 10%;  border-top-width: 3px; border-left-width: 3px;  border-radius: 5px 0 0 0; }
+.id-frame-corner.tr { top: 15%; right: 10%; border-top-width: 3px; border-right-width: 3px; border-radius: 0 5px 0 0; }
+.id-frame-corner.bl { bottom: 15%; left: 10%;  border-bottom-width: 3px; border-left-width: 3px;  border-radius: 0 0 0 5px; }
+.id-frame-corner.br { bottom: 15%; right: 10%; border-bottom-width: 3px; border-right-width: 3px; border-radius: 0 0 5px 0; }
+.id-frame-corner.verified { border-color: #22c55e !important; filter: drop-shadow(0 0 5px rgba(34,197,94,0.7)) !important; }
+
+/* ID scan line */
+.id-scan-line {
+  position: absolute; left: 10%; right: 10%; height: 1.5px;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(0,85,165,0.3) 10%,
+    rgba(0,149,255,1) 40%, rgba(0,220,255,1) 50%,
+    rgba(0,149,255,1) 60%, rgba(0,85,165,0.3) 90%, transparent 100%);
+  z-index: 6; border-radius: 2px;
+  box-shadow: 0 0 10px rgba(0,149,255,0.5);
+  animation: id-scan 2.2s ease-in-out infinite;
+}
+@keyframes id-scan {
+  0%   { top: 16%; opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { top: 84%; opacity: 0; }
+}
+
+/* Bottom hint */
+.id-frame-hint {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 10px 14px;
+  background: linear-gradient(0deg, rgba(8,12,20,0.9) 0%, transparent 100%);
+  text-align: center; z-index: 9;
+}
+.id-frame-hint-text { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.75); }
 
 /* KYC source toggle */
 .kyc-src-btn {
@@ -1226,16 +1286,8 @@ img { max-width: 100%; }
   background: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
   color: var(--muted); transition: all .2s;
 }
-.kyc-src-btn.active { border-color: var(--blue); background: var(--blue-l); color: var(--blue); }
-
-/* KYC camera wrap */
-.kyc-cam-wrap {
-  position: relative; width: 100%; aspect-ratio: 16/10;
-  background: #1a1a2e; border-radius: 14px; overflow: hidden;
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
-}
-.kyc-cam-idle { display: flex; flex-direction: column; align-items: center; z-index: 2; }
-.kyc-cam-wrap video { position: absolute; width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
+.kyc-src-btn.active { border-color: #0055A5; background: #eff6ff; color: #0055A5; }
+.kyc-cam-idle { display: flex; flex-direction: column; align-items: center; z-index: 7; }
 
 /* KYC action buttons */
 .kyc-action-btn {
