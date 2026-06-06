@@ -368,10 +368,27 @@
                 <video id="selfieCamVideo" autoplay playsinline muted style="display:none;position:absolute;width:100%;height:100%;object-fit:cover;border-radius:20px;"></video>
                 <img id="selfieCapturedImg" style="display:none;position:absolute;width:100%;height:100%;object-fit:cover;border-radius:20px;" />
                 <div class="selfie-oval-ring" id="selfieOval"></div>
+                <!-- Face landmark dots -->
+                <div class="selfie-dots" id="selfieDots">
+                  <div class="selfie-dot d1"></div>
+                  <div class="selfie-dot d2"></div>
+                  <div class="selfie-dot d3"></div>
+                  <div class="selfie-dot d4"></div>
+                  <div class="selfie-dot d5"></div>
+                  <div class="selfie-dot d6"></div>
+                  <div class="selfie-dot d7"></div>
+                  <div class="selfie-dot d8"></div>
+                  <div class="selfie-dot d9"></div>
+                </div>
+                <!-- Direction arrows -->
+                <div class="selfie-arrow left"  id="arrowLeft"><i class="fa-solid fa-arrow-left"></i></div>
+                <div class="selfie-arrow right" id="arrowRight"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="selfie-arrow up"    id="arrowUp"><i class="fa-solid fa-arrow-up"></i></div>
+                <div class="selfie-arrow down"  id="arrowDown"><i class="fa-solid fa-arrow-down"></i></div>
                 <div class="selfie-scan-line" id="selfieScan"></div>
                 <div class="selfie-inner" id="apSelfiePreview">
-                  <i class="fa-solid fa-face-smile" style="font-size:44px;color:#9ca3af;margin-bottom:10px;"></i>
-                  <span style="font-weight:600;font-size:14px;color:#9ca3af;">Camera starting...</span>
+                  <i class="fa-solid fa-user" style="font-size:48px;color:rgba(99,179,237,0.3);margin-bottom:10px;"></i>
+                  <span style="font-weight:600;font-size:13px;color:rgba(99,179,237,0.6);letter-spacing:.05em;">INITIALISING...</span>
                 </div>
               </div>
               <canvas id="selfieCamCanvas" style="display:none;"></canvas>

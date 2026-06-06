@@ -745,15 +745,29 @@ var selfieCamStream = null;
 
 // ─── LIVENESS CHECK ──────────────────────────────────────────
 var livenessSteps = [
-  { icon: '😐', text: 'Look straight ahead',   duration: 2000 },
-  { icon: '⬅️', text: 'Turn your head left',   duration: 2000 },
-  { icon: '➡️', text: 'Turn your head right',  duration: 2000 },
-  { icon: '😊', text: 'Smile naturally',        duration: 1800 },
-  { icon: '😉', text: 'Blink once',             duration: 1500 },
+  { label: 'STEP 1 / 5', text: 'Look straight ahead',  arrow: null,    duration: 2200 },
+  { label: 'STEP 2 / 5', text: 'Turn your head left',  arrow: 'left',  duration: 2200 },
+  { label: 'STEP 3 / 5', text: 'Turn your head right', arrow: 'right', duration: 2200 },
+  { label: 'STEP 4 / 5', text: 'Look up slowly',       arrow: 'up',    duration: 2000 },
+  { label: 'STEP 5 / 5', text: 'Look back straight',   arrow: null,    duration: 1800 },
 ];
 var livenessIdx = 0;
 var livenessTimer = null;
 var livenessActive = false;
+
+function hideAllArrows() {
+  ['arrowLeft','arrowRight','arrowUp','arrowDown'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('show');
+  });
+}
+
+function showArrow(dir) {
+  hideAllArrows();
+  if (!dir) return;
+  var el = document.getElementById('arrow' + dir.charAt(0).toUpperCase() + dir.slice(1));
+  if (el) el.classList.add('show');
+}
 
 function livenessReset() {
   livenessIdx = 0; livenessActive = false;
@@ -762,6 +776,7 @@ function livenessReset() {
   if (bar) bar.style.display = 'none';
   var prog = document.getElementById('livenessProgress');
   if (prog) prog.style.width = '0%';
+  hideAllArrows();
   document.getElementById('selfieCaptureBtn').style.display = 'none';
   document.getElementById('selfieRetryBtn').style.display   = 'none';
   var nextBtn = document.getElementById('selfieNextBtn');
@@ -779,8 +794,9 @@ function livenessRunStep() {
     livenessComplete(); return;
   }
   var step = livenessSteps[livenessIdx];
-  document.getElementById('livenessIcon').textContent = step.icon;
+  document.getElementById('livenessIcon').textContent = step.label;
   document.getElementById('livenessText').textContent = step.text;
+  showArrow(step.arrow);
   var prog = document.getElementById('livenessProgress');
   prog.style.transition = 'none'; prog.style.width = '0%';
   var pct = ((livenessIdx + 1) / livenessSteps.length * 100).toFixed(0) + '%';
@@ -795,8 +811,9 @@ function livenessRunStep() {
 }
 
 function livenessComplete() {
-  document.getElementById('livenessIcon').textContent = '✅';
-  document.getElementById('livenessText').textContent = 'Verification complete — take your selfie';
+  hideAllArrows();
+  document.getElementById('livenessIcon').textContent = 'VERIFIED';
+  document.getElementById('livenessText').textContent = 'Face verified — take your photo now';
   document.getElementById('livenessProgress').style.width = '100%';
   document.getElementById('selfieCaptureBtn').style.display = 'inline-flex';
 }
@@ -812,6 +829,10 @@ async function selfieCamInit() {
     if (preview) preview.style.display = 'none';
     document.getElementById('selfieRetryBtn').style.display = 'none';
     document.getElementById('selfieCaptureBtn').style.display = 'none';
+    var dots = document.getElementById('selfieDots');
+    if (dots) dots.style.display = 'block';
+    var scan = document.getElementById('selfieScan');
+    if (scan) scan.style.display = 'block';
     setTimeout(livenessStart, 800);
   } catch(e) {
     if (preview) {
@@ -841,6 +862,11 @@ function selfieCamCapture() {
   document.getElementById('selfieCaptureBtn').style.display = 'none';
   document.getElementById('selfieRetryBtn').style.display   = 'inline-flex';
   document.getElementById('livenessBar').style.display = 'none';
+  hideAllArrows();
+  var dots = document.getElementById('selfieDots');
+  if (dots) dots.style.display = 'none';
+  var scan = document.getElementById('selfieScan');
+  if (scan) scan.style.display = 'none';
   var nextBtn = document.getElementById('selfieNextBtn');
   if (nextBtn) nextBtn.style.display = 'inline-flex';
   window._selfieCapturedDataUrl = dataUrl;
