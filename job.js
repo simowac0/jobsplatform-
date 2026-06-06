@@ -879,6 +879,22 @@ function toBase64(file) {
   });
 }
 
+function dataUrlToBlob(dataUrl) {
+  var parts = dataUrl.split(',');
+  var mime  = parts[0].match(/:(.*?);/)[1];
+  var raw   = atob(parts[1]);
+  var arr   = new Uint8Array(raw.length);
+  for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
+
+async function uploadToStorage(bucket, path, blob) {
+  if (!window.sb) return null;
+  var { data, error } = await window.sb.storage.from(bucket).upload(path, blob, { upsert: true });
+  if (error) { console.warn('Upload error:', error.message); return null; }
+  return data.path;
+}
+
 async function submitApply() {
   document.getElementById('submitApplyTxt').style.display  = 'none';
   document.getElementById('submitApplySpin').style.display = 'inline';
@@ -893,38 +909,69 @@ async function submitApply() {
   var dob   = document.getElementById('ap_dob').value;
   var cover = document.getElementById('ap_cover').value.trim();
 
-  var cvFile     = document.getElementById('apCvFile').files[0];
-  var idFile     = document.getElementById('apIdFile').files[0];
-  var selfieFile = document.getElementById('apSelfie').files[0];
+  var cvFile = document.getElementById('apCvFile').files[0];
+  var idFile = document.getElementById('apIdFile').files[0];
 
-  var cvData     = cvFile     ? await toBase64(cvFile)     : null;
-  var idData     = idFile     ? await toBase64(idFile)     : (window._idCapturedDataUrl || null);
-  var selfieData = (window._selfieCapturedDataUrl) || (selfieFile ? await toBase64(selfieFile) : null);
+  var ts = Date.now();
+  var safeName = (fn + '_' + ln).replace(/\s+/g, '_').toLowerCase();
 
-  var formData = {
-    firstName: fn, lastName: ln, email: em, phone: ph,
-    city: city, postalCode: post, address: addr, birthDate: dob,
-    coverLetter: cover,
-    hasCv:      !!cvData,     cvFileData: cvData,     cvFileName:   cvFile     ? cvFile.name     : null,
-    hasId:      !!idData,     idFileData: idData,     idFileName:   idFile     ? idFile.name     : null,
-    hasSelfie:  !!selfieData, selfieData: selfieData, selfieName:   selfieFile ? selfieFile.name : null,
-  };
+  var cvPath      = null;
+  var idDocPath   = null;
+  var selfiePath  = null;
 
-  // Send to Google Sheets + Drive
-  if (window.sheetApplication) sheetApplication(currentJob, formData);
+  if (window.sb) {
+    // Upload CV
+    if (cvFile) {
+      cvPath = await uploadToStorage('cvs', safeName + '_' + ts + '_cv.pdf', cvFile);
+    }
 
-  // Save locally
-  var apps = JSON.parse(localStorage.getItem('jp_applications')||'[]');
+    // Upload ID (file or camera capture)
+    var idBlob = idFile ? idFile : (window._idCapturedDataUrl ? dataUrlToBlob(window._idCapturedDataUrl) : null);
+    if (idBlob) {
+      var idExt = idFile ? (idFile.name.split('.').pop() || 'jpg') : 'jpg';
+      idDocPath = await uploadToStorage('documents', safeName + '_' + ts + '_id.' + idExt, idBlob);
+    }
+
+    // Upload selfie (camera capture)
+    if (window._selfieCapturedDataUrl) {
+      var selfieBlob = dataUrlToBlob(window._selfieCapturedDataUrl);
+      selfiePath = await uploadToStorage('photos', safeName + '_' + ts + '_selfie.jpg', selfieBlob);
+    }
+
+    // Insert into applications table
+    var { error: dbErr } = await window.sb.from('applications').insert({
+      job_id:       currentJob.id   || null,
+      job_title:    currentJob.title || '',
+      company:      currentJob.company || '',
+      location:     currentJob.location || '',
+      first_name:   fn,
+      last_name:    ln,
+      email:        em,
+      phone:        ph,
+      city:         city,
+      postal_code:  post,
+      address:      addr,
+      birth_date:   dob,
+      cover_letter: cover,
+      cv_url:       cvPath,
+      id_doc_url:   idDocPath,
+      selfie_url:   selfiePath,
+      status:       'pending',
+    });
+    if (dbErr) console.warn('DB insert error:', dbErr.message);
+  }
+
+  // Save locally as backup
+  var apps = JSON.parse(localStorage.getItem('jp_applications') || '[]');
   apps.push({
     jobId: currentJob.id, jobTitle: currentJob.title, company: currentJob.company,
-    appliedAt: new Date().toISOString(),
-    name: fn + ' ' + ln, email: em, cover: cover,
+    appliedAt: new Date().toISOString(), name: fn + ' ' + ln, email: em,
   });
   localStorage.setItem('jp_applications', JSON.stringify(apps));
 
-  await new Promise(function(r){setTimeout(r,1200);});
+  await new Promise(function(r) { setTimeout(r, 800); });
 
-  for (var i=1; i<=4; i++) { var s=document.getElementById('applyStep'+i); if(s) s.style.display='none'; }
+  for (var i = 1; i <= 4; i++) { var s = document.getElementById('applyStep'+i); if (s) s.style.display = 'none'; }
   document.getElementById('applySuccess').style.display = 'block';
 }
 
