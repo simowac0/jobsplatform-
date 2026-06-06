@@ -1246,111 +1246,232 @@ img { max-width: 100%; }
 .kyc-capture-btn { background: #2563eb; }
 .kyc-retry-btn { background: #6b7280; }
 
-/* Selfie frame — banking KYC style */
+/* ═══ CASHPLUS-STYLE KYC FACE VERIFICATION ═══ */
+
+/* Outer wrapper — dark camera environment */
 .selfie-frame-wrap {
   position: relative;
   width: 100%;
-  height: 320px;
-  background: #0d1117;
+  height: 380px;
+  background: linear-gradient(180deg, #0a0e1a 0%, #0d1520 100%);
   border-radius: 20px;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
-/* Face oval cutout */
+/* Top status bar inside camera */
+.kyc-status-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 14px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  z-index: 10;
+  background: linear-gradient(180deg, rgba(10,14,26,0.9) 0%, transparent 100%);
+}
+.kyc-status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #ef4444;
+  animation: rec-blink 1.2s ease-in-out infinite;
+}
+.kyc-status-dot.active { background: #22c55e; animation: none; }
+@keyframes rec-blink {
+  0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+}
+.kyc-status-label {
+  font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5);
+  letter-spacing: .1em; text-transform: uppercase;
+}
+.kyc-quality-bar {
+  display: flex; gap: 3px; align-items: center;
+}
+.kyc-quality-seg {
+  width: 18px; height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,0.15);
+  transition: background .3s;
+}
+.kyc-quality-seg.on { background: #22c55e; }
+
+/* Face oval — SVG-style with dashed segments */
 .selfie-oval-ring {
   position: absolute;
-  width: 170px; height: 220px;
+  width: 190px; height: 248px;
   border-radius: 50%;
-  border: 2.5px solid rgba(59,130,246,0.9);
-  box-shadow:
-    0 0 0 2000px rgba(13,17,23,0.82),
-    0 0 0 4px rgba(59,130,246,0.15),
-    inset 0 0 24px rgba(59,130,246,0.08);
-  z-index: 2;
-  animation: oval-pulse 2.4s ease-in-out infinite;
+  border: none;
+  z-index: 3;
+  /* Dashed oval via outline trick */
+  box-shadow: 0 0 0 2000px rgba(10,14,26,0.75);
 }
-@keyframes oval-pulse {
-  0%,100% { border-color: rgba(59,130,246,0.7); box-shadow: 0 0 0 2000px rgba(13,17,23,0.82), 0 0 0 4px rgba(59,130,246,0.1); }
-  50%      { border-color: rgba(99,179,237,1);   box-shadow: 0 0 0 2000px rgba(13,17,23,0.82), 0 0 0 6px rgba(59,130,246,0.25), 0 0 30px rgba(59,130,246,0.2); }
+/* Animated border via pseudo — we use a canvas-drawn SVG approach via box */
+.selfie-oval-ring::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #0055A5;
+  border-right-color: #0055A5;
+  animation: oval-rotate 3s linear infinite;
 }
+.selfie-oval-ring::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-bottom-color: rgba(0,85,165,0.4);
+  border-left-color: rgba(0,85,165,0.4);
+  animation: oval-rotate 3s linear infinite reverse;
+}
+@keyframes oval-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.selfie-oval-ring.verified::before { border-color: #22c55e; animation: none; }
+.selfie-oval-ring.verified::after  { border-color: rgba(34,197,94,0.4); animation: none; }
 
 /* Face landmark dots */
 .selfie-dots {
   position: absolute;
-  width: 170px; height: 220px;
+  width: 190px; height: 248px;
   border-radius: 50%;
-  z-index: 3;
+  z-index: 4;
   pointer-events: none;
 }
 .selfie-dot {
   position: absolute;
-  width: 5px; height: 5px;
-  background: rgba(99,179,237,0.7);
+  width: 4px; height: 4px;
+  background: rgba(0,120,255,0.8);
   border-radius: 50%;
-  animation: dot-blink 1.8s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(0,120,255,0.6);
+  animation: dot-pulse 2s ease-in-out infinite;
 }
-/* Eye left */ .selfie-dot.d1 { top: 34%; left: 22%; animation-delay: 0s; }
-/* Eye right */.selfie-dot.d2 { top: 34%; right: 22%; animation-delay: 0.2s; }
-/* Nose */     .selfie-dot.d3 { top: 52%; left: 50%; transform: translateX(-50%); animation-delay: 0.4s; }
-/* Mouth L */  .selfie-dot.d4 { top: 66%; left: 32%; animation-delay: 0.1s; }
-/* Mouth R */  .selfie-dot.d5 { top: 66%; right: 32%; animation-delay: 0.3s; }
-/* Chin */     .selfie-dot.d6 { top: 80%; left: 50%; transform: translateX(-50%); animation-delay: 0.5s; }
-/* Forehead */ .selfie-dot.d7 { top: 12%; left: 50%; transform: translateX(-50%); animation-delay: 0.15s; }
-/* Cheek L */  .selfie-dot.d8 { top: 55%; left: 10%; animation-delay: 0.35s; }
-/* Cheek R */  .selfie-dot.d9 { top: 55%; right: 10%; animation-delay: 0.45s; }
-@keyframes dot-blink {
-  0%,100% { opacity: 0.4; transform: scale(1) translateX(var(--tx,0)); }
-  50%      { opacity: 1;   transform: scale(1.4) translateX(var(--tx,0)); }
+.selfie-dot.d1  { top: 32%; left: 24%; animation-delay: 0s; }
+.selfie-dot.d2  { top: 32%; right: 24%; animation-delay: .15s; }
+.selfie-dot.d3  { top: 30%; left: 38%; animation-delay: .05s; }
+.selfie-dot.d4  { top: 30%; right: 38%; animation-delay: .2s; }
+.selfie-dot.d5  { top: 50%; left: 49%; animation-delay: .3s; }
+.selfie-dot.d6  { top: 65%; left: 35%; animation-delay: .1s; }
+.selfie-dot.d7  { top: 65%; right: 35%; animation-delay: .25s; }
+.selfie-dot.d8  { top: 72%; left: 50%; transform: translateX(-50%); animation-delay: .4s; }
+.selfie-dot.d9  { top: 84%; left: 50%; transform: translateX(-50%); animation-delay: .35s; }
+.selfie-dot.d10 { top: 10%; left: 50%; transform: translateX(-50%); animation-delay: .08s; }
+.selfie-dot.d11 { top: 52%; left: 8%; animation-delay: .45s; }
+.selfie-dot.d12 { top: 52%; right: 8%; animation-delay: .5s; }
+@keyframes dot-pulse {
+  0%,100% { opacity: 0.35; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.8); }
 }
-
-/* Direction arrow */
-.selfie-arrow {
-  position: absolute;
-  z-index: 5;
-  font-size: 28px;
-  color: rgba(59,130,246,0.9);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .3s, transform .3s;
-  filter: drop-shadow(0 0 8px rgba(59,130,246,0.6));
-}
-.selfie-arrow.show { opacity: 1; }
-.selfie-arrow.left  { left: 12px;  top: 50%; transform: translateY(-50%); }
-.selfie-arrow.right { right: 12px; top: 50%; transform: translateY(-50%); }
-.selfie-arrow.up    { top: 12px;   left: 50%; transform: translateX(-50%); }
-.selfie-arrow.down  { bottom: 12px; left: 50%; transform: translateX(-50%); }
 
 /* Scan line */
 .selfie-scan-line {
   position: absolute;
-  width: 164px;
-  height: 1.5px;
-  background: linear-gradient(90deg, transparent 0%, rgba(99,179,237,0.6) 30%, rgba(59,130,246,1) 50%, rgba(99,179,237,0.6) 70%, transparent 100%);
-  z-index: 4;
-  animation: selfie-scan 2.4s ease-in-out infinite;
-  border-radius: 2px;
+  width: 184px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0,85,165,0.3) 15%,
+    rgba(0,149,255,0.9) 40%,
+    rgba(0,200,255,1) 50%,
+    rgba(0,149,255,0.9) 60%,
+    rgba(0,85,165,0.3) 85%,
+    transparent 100%);
+  z-index: 5;
+  animation: selfie-scan 2.6s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(0,149,255,0.4);
 }
 @keyframes selfie-scan {
-  0%   { top: calc(50% - 110px); opacity: 0; }
-  8%   { opacity: 1; }
-  92%  { opacity: 1; }
-  100% { top: calc(50% + 110px); opacity: 0; }
+  0%   { top: calc(50% - 124px); opacity: 0; }
+  6%   { opacity: 1; }
+  94%  { opacity: 1; }
+  100% { top: calc(50% + 124px); opacity: 0; }
 }
 
-.selfie-inner { display: flex; flex-direction: column; align-items: center; z-index: 6; position: relative; }
+/* Direction arrows — fintech style */
+.selfie-arrow {
+  position: absolute;
+  z-index: 8;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .25s;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 4px;
+}
+.selfie-arrow.show { opacity: 1; }
+.selfie-arrow-icon {
+  width: 36px; height: 36px;
+  background: rgba(0,85,165,0.85);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: #fff;
+  box-shadow: 0 0 16px rgba(0,85,165,0.5);
+  animation: arrow-bounce 0.7s ease-in-out infinite alternate;
+}
+.selfie-arrow-label {
+  font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.7);
+  letter-spacing: .06em; text-transform: uppercase;
+}
+@keyframes arrow-bounce {
+  from { transform: scale(1); }
+  to   { transform: scale(1.12); box-shadow: 0 0 24px rgba(0,85,165,0.7); }
+}
+.selfie-arrow.left  { left: 14px;   top: 50%; transform: translateY(-50%); }
+.selfie-arrow.right { right: 14px;  top: 50%; transform: translateY(-50%); }
+.selfie-arrow.up    { top: 14px;    left: 50%; transform: translateX(-50%); flex-direction: column; }
+.selfie-arrow.down  { bottom: 14px; left: 50%; transform: translateX(-50%); flex-direction: column-reverse; }
 
-/* Liveness bar */
-#livenessBar {
-  background: #0f172a;
-  border: 1px solid rgba(59,130,246,0.2);
-  border-radius: 14px;
-  padding: 14px 16px;
+/* Bottom instruction inside frame */
+.kyc-frame-hint {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 14px 18px;
+  background: linear-gradient(0deg, rgba(10,14,26,0.9) 0%, transparent 100%);
   text-align: center;
+  z-index: 9;
 }
-#livenessText { font-size: 14px; font-weight: 700; color: #e2e8f0; letter-spacing: .01em; }
-#livenessIcon { font-size: 11px; font-weight: 600; color: #3b82f6; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
-#livenessProgress { background: #3b82f6; }
+.kyc-frame-hint-text {
+  font-size: 13px; font-weight: 600; color: #fff;
+  letter-spacing: .01em;
+}
+.kyc-frame-hint-sub {
+  font-size: 11px; color: rgba(255,255,255,0.45);
+  margin-top: 2px;
+}
+
+.selfie-inner { display: flex; flex-direction: column; align-items: center; z-index: 7; position: relative; }
+
+/* Liveness instruction panel — Cashplus fintech style */
+#livenessBar {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 16px 18px 14px;
+  text-align: left;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.liveness-header {
+  display: flex; align-items: center; gap: 10px;
+}
+.liveness-step-badge {
+  background: #0055A5; color: #fff;
+  font-size: 10px; font-weight: 800;
+  padding: 3px 8px; border-radius: 20px;
+  letter-spacing: .06em; white-space: nowrap;
+  flex-shrink: 0;
+}
+#livenessText {
+  font-size: 14px; font-weight: 700; color: #0f172a;
+  flex: 1;
+}
+#livenessIcon { display: none; }
+.liveness-progress-wrap {
+  height: 4px; background: #f1f5f9; border-radius: 4px; overflow: hidden;
+}
+#livenessProgress {
+  height: 4px; background: linear-gradient(90deg, #0055A5, #0099ff);
+  border-radius: 4px; transition: width .3s linear;
+}
 
 .upload-preview-img {
   width: 100%; max-height: 160px;

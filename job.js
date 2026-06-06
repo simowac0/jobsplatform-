@@ -783,9 +783,25 @@ function livenessReset() {
   if (nextBtn) nextBtn.style.display = 'none';
 }
 
+function kycSetStatus(label, active) {
+  var dot = document.getElementById('kycDot');
+  var lbl = document.getElementById('kycStatusLabel');
+  if (dot) dot.className = 'kyc-status-dot' + (active ? ' active' : '');
+  if (lbl) lbl.textContent = label;
+}
+
+function kycSetQuality(level) {
+  var segs = document.querySelectorAll('.kyc-quality-seg');
+  segs.forEach(function(s, i) { s.classList.toggle('on', i < level); });
+}
+
 function livenessStart() {
   livenessActive = true;
   document.getElementById('livenessBar').style.display = 'block';
+  var hint = document.getElementById('kycHint');
+  if (hint) hint.style.display = 'block';
+  kycSetStatus('Live', true);
+  kycSetQuality(4);
   livenessRunStep();
 }
 
@@ -795,8 +811,11 @@ function livenessRunStep() {
   }
   var step = livenessSteps[livenessIdx];
   document.getElementById('livenessIcon').textContent = step.label;
+  document.getElementById('livenessIcon').style.background = '#0055A5';
   document.getElementById('livenessText').textContent = step.text;
   showArrow(step.arrow);
+  var hintText = document.getElementById('kycHintText');
+  if (hintText) hintText.textContent = step.text;
   var prog = document.getElementById('livenessProgress');
   prog.style.transition = 'none'; prog.style.width = '0%';
   var pct = ((livenessIdx + 1) / livenessSteps.length * 100).toFixed(0) + '%';
@@ -812,9 +831,17 @@ function livenessRunStep() {
 
 function livenessComplete() {
   hideAllArrows();
-  document.getElementById('livenessIcon').textContent = 'VERIFIED';
-  document.getElementById('livenessText').textContent = 'Face verified — take your photo now';
+  document.getElementById('livenessIcon').textContent = '✓ VERIFIED';
+  document.getElementById('livenessIcon').style.background = '#16a34a';
+  document.getElementById('livenessText').textContent = 'Liveness confirmed — capture your photo';
   document.getElementById('livenessProgress').style.width = '100%';
+  document.getElementById('livenessProgress').style.background = 'linear-gradient(90deg,#16a34a,#22c55e)';
+  kycSetStatus('Verified', true);
+  kycSetQuality(5);
+  var oval = document.getElementById('selfieOval');
+  if (oval) oval.classList.add('verified');
+  var hintText = document.getElementById('kycHintText');
+  if (hintText) hintText.textContent = 'Liveness check passed — take your photo';
   document.getElementById('selfieCaptureBtn').style.display = 'inline-flex';
 }
 
@@ -829,11 +856,14 @@ async function selfieCamInit() {
     if (preview) preview.style.display = 'none';
     document.getElementById('selfieRetryBtn').style.display = 'none';
     document.getElementById('selfieCaptureBtn').style.display = 'none';
+    kycSetStatus('Detecting', false);
+    kycSetQuality(2);
     var dots = document.getElementById('selfieDots');
     if (dots) dots.style.display = 'block';
     var scan = document.getElementById('selfieScan');
     if (scan) scan.style.display = 'block';
-    setTimeout(livenessStart, 800);
+    setTimeout(function(){ kycSetQuality(3); kycSetStatus('Detected', false); }, 500);
+    setTimeout(livenessStart, 1200);
   } catch(e) {
     if (preview) {
       preview.style.display = 'flex';
