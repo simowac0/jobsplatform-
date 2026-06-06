@@ -1630,3 +1630,133 @@ img { max-width: 100%; }
   .auth-right { padding:32px 20px; }
   .auth-card { padding:20px 0; }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE PRO REDESIGN — max 480px
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+
+  /* ── GLOBAL ── */
+  .container { padding: 0 16px; }
+
+  /* ── NAVBAR ── */
+  .navbar { padding: 0 16px; height: 56px; }
+  .nav-inner { height: 56px; }
+  .logo-text { font-size: 17px; }
+  .logo-icon { width: 32px; height: 32px; font-size: 14px; }
+  .lang-btn { padding: 6px 10px; font-size: 12px; border-radius: 18px; }
+  .lang-btn .lang-label { display: none; }
+  .nav-right .btn-ghost { padding: 7px 12px; font-size: 12px; }
+  .nav-avatar { width: 28px; height: 28px; font-size: 11px; }
+  .nav-username { font-size: 13px; }
+
+  /* ── HERO (jobs page) ── */
+  .jobs-hero { padding: 32px 0 28px; }
+  .jobs-hero h1 { font-size: 24px; margin-bottom: 8px; }
+  .jobs-hero p { font-size: 14px; margin-bottom: 20px; }
+  .jobs-search { border-radius: 14px; }
+  .search-bar { flex-direction: column; gap: 8px; padding: 10px; }
+  .search-bar input { padding: 12px 14px 12px 38px; font-size: 14px; border-radius: 10px; }
+  .search-bar .btn-primary { width: 100%; justify-content: center; padding: 12px; border-radius: 10px; font-size: 14px; }
+
+  /* ── JOBS LAYOUT ── */
+  .jobs-layout { padding: 16px 0 60px; }
+  .jobs-container { grid-template-columns: 1fr; gap: 12px; }
+
+  /* ── SIDEBAR / FILTERS ── */
+  .sidebar { border-radius: 14px; padding: 16px; }
+  .sidebar-section h4 { font-size: 12px; }
+  .filter-check { font-size: 13px; }
+
+  /* ── JOB CARDS ── */
+  .jobs-toolbar { padding: 10px 14px; border-radius: 12px; }
+  .jobs-count { font-size: 13px; }
+  .jobs-sort select { font-size: 13px; padding: 5px 10px; }
+
+  .job-card { padding: 16px; gap: 12px; border-radius: 14px; }
+  .job-logo { width: 44px; height: 44px; border-radius: 10px; font-size: 14px; }
+  .job-title { font-size: 15px; }
+  .job-company { font-size: 13px; margin-bottom: 10px; }
+  .job-tags { gap: 6px; margin-bottom: 12px; }
+  .job-tag { font-size: 12px; padding: 3px 8px; }
+  .job-actions { flex-direction: row; gap: 8px; }
+  .job-actions .btn-primary,
+  .job-actions .btn-ghost { padding: 9px 16px; font-size: 13px; border-radius: 10px; }
+
+  /* ── JOB DETAIL PAGE ── */
+  .job-detail-hero { padding: 24px 0 20px; }
+  .job-detail-grid { grid-template-columns: 1fr; gap: 16px; }
+  .job-detail-main { order: 2; }
+  .job-detail-sidebar { order: 1; }
+
+  /* ── APPLY MODAL / FORM ── */
+  .apply-modal-inner { padding: 20px 16px; border-radius: 20px 20px 0 0; max-height: 90vh; }
+  .apply-steps { gap: 0; margin-bottom: 24px; }
+  .apply-step-label { font-size: 10px; }
+  .apply-step-circle { width: 28px; height: 28px; font-size: 12px; }
+
+  /* Form inputs */
+  .form-row { grid-template-columns: 1fr; gap: 0; }
+  .input-wrap input,
+  .input-wrap select { padding: 12px 12px 12px 36px; font-size: 14px; border-radius: 12px; }
+  .form-group label { font-size: 13px; margin-bottom: 5px; }
+  .form-group { margin-bottom: 14px; }
+
+  /* CV upload box */
+  .cv-upload-box { padding: 20px 16px; border-radius: 12px; }
+
+  /* ID frame */
+  .id-type-toggle { gap: 8px; }
+  .id-btn { padding: 9px 12px; font-size: 13px; border-radius: 10px; }
+  .kyc-cam-wrap { border-radius: 12px; }
+  .id-frame-wrap { border-radius: 12px; }
+  .kyc-src-btn { padding: 8px 10px; font-size: 12px; border-radius: 9px; }
+  .kyc-action-btn { padding: 9px 16px; font-size: 13px; border-radius: 10px; }
+
+  /* Selfie */
+  .selfie-frame-wrap { height: 240px; border-radius: 16px; }
+  .selfie-oval-ring { width: 140px; height: 180px; }
+
+  /* Buttons */
+  .btn-dark-pill { padding: 13px 20px; font-size: 14px; border-radius: 14px; }
+  .btn-ghost { padding: 11px 16px; font-size: 13px; }
+  .btn-primary { padding: 11px 18px; font-size: 13px; }
+
+  /* Review card */
+  .review-row { padding: 10px 0; font-size: 13px; }
+
+  /* Upload note */
+  .upload-note { font-size: 12px; padding: 10px 12px; border-radius: 10px; }
+
+  /* ── HOME PAGE ── */
+  .hero-section { padding: 40px 0 32px; }
+  .hero-title { font-size: clamp(26px,7vw,36px); }
+  .hero-subtitle { font-size: 14px; }
+  .stat-cards { grid-template-columns: repeat(2,1fr); gap: 10px; margin-top: 24px; }
+  .stat-card { padding: 16px 12px; border-radius: 14px; }
+  .stat-number { font-size: 22px; }
+  .stat-label { font-size: 11px; }
+
+  .section-title { font-size: 22px; }
+  .section-sub { font-size: 13px; }
+
+  .features-grid { grid-template-columns: 1fr; gap: 12px; }
+  .feature-card { padding: 20px 16px; border-radius: 14px; }
+
+  .categories-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
+  .category-card { padding: 16px 12px; border-radius: 14px; }
+
+  .eliminates { padding: 24px 16px; border-radius: 16px; }
+
+  /* ── AUTH / LOGIN PAGE ── */
+  .auth-box { padding: 28px 20px; border-radius: 20px; margin: 0 4px; }
+  .auth-logo span { font-size: 18px; }
+  .auth-tab { font-size: 13px; padding: 9px; }
+  .social-btn { padding: 11px 14px; font-size: 13px; }
+
+  /* ── FOOTER ── */
+  .footer { padding: 40px 0 24px; }
+  .footer-inner { gap: 28px; }
+  .footer-brand { font-size: 14px; }
+}
+
