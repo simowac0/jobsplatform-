@@ -814,21 +814,15 @@ async function selfieCamInit() {
     document.getElementById('selfieCaptureBtn').style.display = 'none';
     setTimeout(livenessStart, 800);
   } catch(e) {
-    // Camera denied — show upload fallback in selfie area
     if (preview) {
       preview.style.display = 'flex';
       preview.innerHTML =
-        '<i class="fa-solid fa-triangle-exclamation" style="font-size:28px;color:#f97316;margin-bottom:8px;"></i>' +
-        '<span style="font-size:13px;font-weight:600;color:#f97316;">Camera access denied</span>' +
-        '<small style="color:#9ca3af;margin-top:4px;">Upload a selfie photo instead</small>';
+        '<i class="fa-solid fa-ban" style="font-size:32px;color:#dc2626;margin-bottom:10px;"></i>' +
+        '<span style="font-size:14px;font-weight:700;color:#dc2626;">Camera access required</span>' +
+        '<small style="color:#9ca3af;margin-top:6px;text-align:center;line-height:1.5;">Please allow camera access in your browser settings and try again.</small>' +
+        '<button onclick="selfieCamRetry()" style="margin-top:12px;padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;"><i class=\"fa-solid fa-rotate-left\"></i> Try Again</button>';
     }
     document.getElementById('livenessBar').style.display = 'none';
-    // Show upload option
-    var uploadFallback = document.getElementById('selfieFallbackUpload');
-    if (uploadFallback) uploadFallback.style.display = 'block';
-    var nextBtn = document.getElementById('selfieNextBtn');
-    // Allow skip if camera not available
-    if (nextBtn) nextBtn.style.display = 'inline-flex';
   }
 }
 
