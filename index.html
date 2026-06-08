@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Search verified UK job listings with transparent salaries and 48-hour employer response guarantee." />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="JobsPlatform" />
   <title>JobsPlatform – Find Verified UK Jobs</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="jobsplatform-theme.css" />
@@ -40,6 +44,8 @@
       <a href="login.html?tab=register&role=employer" class="btn-primary" style="display:inline-block;margin-top:10px;" data-t="nav_post">Post a Job</a>
     </div>
   </header>
+
+  <main class="site-main">
 
   <!-- ===== HERO ===== -->
   <section class="hero">
@@ -89,23 +95,23 @@
             <div class="jcp-header">
               <div class="jcp-logo">SC</div>
               <div>
-                <div class="jcp-title">Senior Care Assistant</div>
-                <div class="jcp-company">SunCare Group <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></div>
+                <div class="jcp-title" data-ui="hero_card_title">Senior Care Assistant</div>
+                <div class="jcp-company"><span data-ui="hero_card_company">SunCare Group</span> <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> <span data-ui="verified">Verified</span></span></div>
               </div>
             </div>
             <div class="jcp-tags">
-              <span><i class="fa-solid fa-location-dot"></i> Manchester</span>
-              <span><i class="fa-solid fa-clock"></i> Full-time</span>
-              <span><i class="fa-solid fa-sterling-sign"></i> £28k–£32k</span>
+              <span><i class="fa-solid fa-location-dot"></i> <span data-ui="hero_card_loc">Manchester</span></span>
+              <span><i class="fa-solid fa-clock"></i> <span data-ui="hero_card_type">Full-time</span></span>
+              <span><i class="fa-solid fa-sterling-sign"></i> <span data-ui="hero_card_salary">£28k–£32k</span></span>
             </div>
-            <div class="jcp-respond"><i class="fa-solid fa-hourglass-half"></i> Responds within 24h</div>
+            <div class="jcp-respond"><i class="fa-solid fa-hourglass-half"></i> <span data-ui="hero_card_respond">Responds within 24h</span></div>
             <a href="login.html" class="btn-primary" style="width:100%;margin-top:12px;display:flex;justify-content:center;" data-t="apply">Apply Now</a>
           </div>
           <div class="stat-cards">
-            <div class="stat-card"><div class="stat-num">12,847</div><div class="stat-label">Jobs this week</div></div>
-            <div class="stat-card"><div class="stat-num">4.2d</div><div class="stat-label">Avg. response</div></div>
-            <div class="stat-card green"><div class="stat-num">94%</div><div class="stat-label">Satisfaction</div></div>
-            <div class="stat-card"><div class="stat-num">0</div><div class="stat-label">Spam listings</div></div>
+            <div class="stat-card"><div class="stat-num">12,847</div><div class="stat-label" data-ui="hero_stat_jobs">Jobs this week</div></div>
+            <div class="stat-card"><div class="stat-num">4.2d</div><div class="stat-label" data-ui="hero_stat_resp">Avg. response</div></div>
+            <div class="stat-card green"><div class="stat-num">94%</div><div class="stat-label" data-ui="hero_stat_sat">Satisfaction</div></div>
+            <div class="stat-card"><div class="stat-num">0</div><div class="stat-label" data-ui="hero_stat_spam">Spam listings</div></div>
           </div>
         </div>
       </div>
@@ -122,38 +128,38 @@
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-icon blue"><i class="fa-solid fa-shield-halved"></i></div>
-          <h3>No Ghost Jobs</h3>
-          <p>100% verified listings. Every job is confirmed active before going live. No more applying to positions that filled months ago.</p>
-          <div class="feature-stat">100% Verified</div>
+          <h3 data-ui="feat1_title">No Ghost Jobs</h3>
+          <p data-ui="feat1_desc">100% verified listings. Every job is confirmed active before going live. No more applying to positions that filled months ago.</p>
+          <div class="feature-stat" data-ui="feat1_stat">100% Verified</div>
         </div>
         <div class="feature-card">
           <div class="feature-icon green"><i class="fa-solid fa-reply-all"></i></div>
-          <h3>Response Guarantee</h3>
-          <p>Employers commit to responding within 48 hours. No more waiting weeks in silence wondering if anyone read your CV.</p>
-          <div class="feature-stat">48h Wait Max</div>
+          <h3 data-ui="feat2_title">Response Guarantee</h3>
+          <p data-ui="feat2_desc">Employers commit to responding within 48 hours. No more waiting weeks in silence wondering if anyone read your CV.</p>
+          <div class="feature-stat" data-ui="feat2_stat">48h Wait Max</div>
         </div>
         <div class="feature-card">
           <div class="feature-icon purple"><i class="fa-solid fa-sterling-sign"></i></div>
-          <h3>Salary Upfront</h3>
-          <p>Every listing shows the full salary range. No more wasting time on interviews only to find out the pay doesn't work.</p>
-          <div class="feature-stat">100% Transparent</div>
+          <h3 data-ui="feat3_title">Salary Upfront</h3>
+          <p data-ui="feat3_desc">Every listing shows the full salary range. No more wasting time on interviews only to find out the pay doesn't work.</p>
+          <div class="feature-stat" data-ui="feat3_stat">100% Transparent</div>
         </div>
         <div class="feature-card">
           <div class="feature-icon orange"><i class="fa-solid fa-people-group"></i></div>
-          <h3>Culture Fit</h3>
-          <p>Rich employer profiles show work culture, team size, and values so you can find a place where you'll actually stay.</p>
-          <div class="feature-stat">89% Retention</div>
+          <h3 data-ui="feat4_title">Culture Fit</h3>
+          <p data-ui="feat4_desc">Rich employer profiles show work culture, team size, and values so you can find a place where you'll actually stay.</p>
+          <div class="feature-stat" data-ui="feat4_stat">89% Retention</div>
         </div>
       </div>
-      <div class="eliminates">
-        <h3>We Eliminate:</h3>
+      <div class="eliminates jp-panel">
+        <h3 data-ui="eliminates_h3">We Eliminate:</h3>
         <div class="elim-list">
-          <span><i class="fa-solid fa-xmark"></i> Vague job postings</span>
-          <span><i class="fa-solid fa-xmark"></i> Employer silence</span>
-          <span><i class="fa-solid fa-xmark"></i> CV black holes</span>
-          <span><i class="fa-solid fa-xmark"></i> Hidden salaries</span>
-          <span><i class="fa-solid fa-xmark"></i> Fake listings</span>
-          <span><i class="fa-solid fa-xmark"></i> Unpaid tests</span>
+          <span><i class="fa-solid fa-xmark"></i> <span data-ui="elim1">Vague job postings</span></span>
+          <span><i class="fa-solid fa-xmark"></i> <span data-ui="elim2">Employer silence</span></span>
+          <span><i class="fa-solid fa-xmark"></i> <span data-ui="elim3">CV black holes</span></span>
+          <span><i class="fa-solid fa-xmark"></i> <span data-ui="elim4">Hidden salaries</span></span>
+          <span><i class="fa-solid fa-xmark"></i> <span data-ui="elim5">Fake listings</span></span>
+          <span><i class="fa-solid fa-xmark"></i> <span data-ui="elim6">Unpaid tests</span></span>
         </div>
       </div>
     </div>
@@ -180,23 +186,23 @@
       <div class="steps-grid">
         <div class="step">
           <div class="step-num">1</div>
-          <h3>Create Your Profile</h3>
-          <p>Build a standout profile in minutes. Add your skills, experience, and what matters to you in a workplace.</p>
-          <blockquote>"I set up my profile in under 10 minutes and had 3 interviews booked by the end of the week." — Sarah T.</blockquote>
+          <h3 data-ui="step1_title">Create Your Profile</h3>
+          <p data-ui="step1_desc">Build a standout profile in minutes. Add your skills, experience, and what matters to you in a workplace.</p>
+          <blockquote data-ui="step1_quote">"I set up my profile in under 10 minutes and had 3 interviews booked by the end of the week." — Sarah T.</blockquote>
         </div>
         <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
         <div class="step">
           <div class="step-num">2</div>
-          <h3>Browse Verified Jobs</h3>
-          <p>Search thousands of real, active listings with full salary details. Filter by location, hours, and industry.</p>
-          <blockquote>"Finally — job listings that actually show the salary and aren't 3 months old." — Marcus B.</blockquote>
+          <h3 data-ui="step2_title">Browse Verified Jobs</h3>
+          <p data-ui="step2_desc">Search thousands of real, active listings with full salary details. Filter by location, hours, and industry.</p>
+          <blockquote data-ui="step2_quote">"Finally — job listings that actually show the salary and aren't 3 months old." — Marcus B.</blockquote>
         </div>
         <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
         <div class="step">
           <div class="step-num">3</div>
-          <h3>Apply &amp; Get Responses</h3>
-          <p>Apply with one click. Employers are committed to responding within 48 hours — no more silence.</p>
-          <blockquote>"Got a call back within a day. This is how job searching should work." — Priya K.</blockquote>
+          <h3 data-ui="step3_title">Apply &amp; Get Responses</h3>
+          <p data-ui="step3_desc">Apply with one click. Employers are committed to responding within 48 hours — no more silence.</p>
+          <blockquote data-ui="step3_quote">"Got a call back within a day. This is how job searching should work." — Priya K.</blockquote>
         </div>
       </div>
     </div>
@@ -212,18 +218,18 @@
       <div class="testimonials-grid">
         <div class="testimonial-card">
           <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-          <p>"After months of no responses on other sites, I found a job here in two weeks. The salary transparency alone saved me so much time."</p>
-          <div class="testimonial-author"><div class="author-avatar ap">AP</div><div><strong>Anna P.</strong><span>Now at Tesco</span></div></div>
+          <p data-ui="testi1_text">"After months of no responses on other sites, I found a job here in two weeks. The salary transparency alone saved me so much time."</p>
+          <div class="testimonial-author"><div class="author-avatar ap">AP</div><div><strong data-ui="testi1_name">Anna P.</strong><span data-ui="testi1_role">Now at Tesco</span></div></div>
         </div>
         <div class="testimonial-card featured">
           <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-          <p>"I was nervous about re-entering the job market after a gap. The no-experience filter and the quick responses made all the difference."</p>
-          <div class="testimonial-author"><div class="author-avatar jw">JW</div><div><strong>James W.</strong><span>Now at Amazon</span></div></div>
+          <p data-ui="testi2_text">"I was nervous about re-entering the job market after a gap. The no-experience filter and the quick responses made all the difference."</p>
+          <div class="testimonial-author"><div class="author-avatar jw">JW</div><div><strong data-ui="testi2_name">James W.</strong><span data-ui="testi2_role">Now at Amazon</span></div></div>
         </div>
         <div class="testimonial-card">
           <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-          <p>"The verified listings are a game changer. No more applying to ghost jobs. Every application I sent got a real response."</p>
-          <div class="testimonial-author"><div class="author-avatar sb">SB</div><div><strong>Sophie B.</strong><span>Now at NHS</span></div></div>
+          <p data-ui="testi3_text">"The verified listings are a game changer. No more applying to ghost jobs. Every application I sent got a real response."</p>
+          <div class="testimonial-author"><div class="author-avatar sb">SB</div><div><strong data-ui="testi3_name">Sophie B.</strong><span data-ui="testi3_role">Now at NHS</span></div></div>
         </div>
       </div>
     </div>
@@ -242,12 +248,14 @@
         <div class="cta-note"><i class="fa-solid fa-lock"></i> <span data-t="footer_note">Free to use · No spam · Unsubscribe any time</span></div>
       </div>
       <div class="cta-stats">
-        <div class="cta-stat"><span>50k+</span><small>Active Users</small></div>
-        <div class="cta-stat"><span>12k+</span><small>Jobs This Week</small></div>
-        <div class="cta-stat"><span>94%</span><small>Satisfaction</small></div>
+        <div class="cta-stat"><span>50k+</span><small data-ui="cta_stat_users">Active Users</small></div>
+        <div class="cta-stat"><span>12k+</span><small data-ui="cta_stat_jobs">Jobs This Week</small></div>
+        <div class="cta-stat"><span>94%</span><small data-ui="cta_stat_sat">Satisfaction</small></div>
       </div>
     </div>
   </section>
+
+  </main>
 
   <!-- ===== FOOTER ===== -->
   <footer class="footer">
@@ -292,6 +300,7 @@
   </footer>
 
   <script src="site-config.js"></script>
+  <script src="seo.js"></script>
   <script src="i18n.js"></script>
   <script src="main.js"></script>
   <script>

@@ -239,7 +239,9 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'splash.html'));
 });
 
-app.get('*', (req, res) => {
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  if (req.path.includes('.')) return res.status(404).send('Not found');
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 

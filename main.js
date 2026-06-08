@@ -19,8 +19,9 @@ document.addEventListener('click', e => {
   if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto') || link.target === '_blank') return;
   e.preventDefault();
   e.stopPropagation();
+  const dest = window.jpUrlWithLang ? window.jpUrlWithLang(href, currentLang) : href;
   document.body.classList.add('page-exit');
-  setTimeout(() => { window.location.href = href; }, 280);
+  setTimeout(() => { window.location.href = dest; }, 280);
 });
 
 // Intercept form submits that navigate
@@ -34,7 +35,10 @@ document.addEventListener('submit', e => {
   e.preventDefault();
   const data = new FormData(form);
   const params = new URLSearchParams(data).toString();
-  const dest = action + (params ? '?' + params : '');
+  var dest = action + (params ? '?' + params : '');
+  if (currentLang !== 'en') {
+    dest += (dest.indexOf('?') >= 0 ? '&' : '?') + 'lang=' + currentLang;
+  }
   document.body.classList.add('page-exit');
   setTimeout(() => { window.location.href = dest; }, 320);
 });
@@ -154,7 +158,13 @@ const LANGS = {
   },
 };
 
-let currentLang = localStorage.getItem('jp_lang') || 'en';
+function getLangFromUrl() {
+  var params = new URLSearchParams(window.location.search);
+  var l = params.get('lang');
+  return LANGS[l] ? l : null;
+}
+
+let currentLang = getLangFromUrl() || localStorage.getItem('jp_lang') || 'en';
 
 function applyLang(code) {
   const L = LANGS[code];
@@ -223,7 +233,15 @@ function applyLang(code) {
 
   // Extended UI translations (i18n.js)
   if (window.jpApplyUI) window.jpApplyUI();
+  if (window.jpApplySEO) window.jpApplySEO(code);
   if (window.onJpLangChange) window.onJpLangChange();
+
+  try {
+    var url = new URL(window.location.href);
+    if (code !== 'en') url.searchParams.set('lang', code);
+    else url.searchParams.delete('lang');
+    history.replaceState(null, '', url.pathname + url.search + url.hash);
+  } catch (e) {}
 }
 
 function buildLangDropdown() {
