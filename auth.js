@@ -4,6 +4,7 @@
 (function() {
   var p = new URLSearchParams(window.location.search);
   if (p.get('tab') === 'register') switchTab('register');
+  window._regRole = p.get('role') === 'employer' ? 'employer' : 'jobseeker';
 })();
 
 // ─── TAB SWITCH ──────────────────────────────────────────────
@@ -84,11 +85,12 @@ async function handleRegister() {
     var { data: authData, error: authErr } = await window.sb.auth.signUp({ email, password });
     if (authErr) { showMsg('regMsg', authErr.message, 'error'); setLoading('regTxt', 'regSpin', false); return; }
     var uid = authData.user.id;
+    var role = window._regRole || 'jobseeker';
     await window.sb.from('profiles').insert({
       id: uid, first_name: firstName, last_name: lastName,
-      email, role: 'jobseeker'
+      email, role: role
     });
-    var user = { id: uid, firstName, lastName, email, role: 'jobseeker' };
+    var user = { id: uid, firstName, lastName, email, role: role };
     localStorage.setItem('jp_user', JSON.stringify(user));
     if (window.sheetRegistration) sheetRegistration(user, {});
     showSuccess('Account Created!', 'Welcome ' + firstName + '!');
@@ -98,7 +100,8 @@ async function handleRegister() {
       showMsg('regMsg', 'Email already registered.', 'error');
       setLoading('regTxt', 'regSpin', false); return;
     }
-    var user = { id: Date.now(), firstName, lastName, email, password, role: 'jobseeker', createdAt: new Date().toISOString() };
+    var role = window._regRole || 'jobseeker';
+    var user = { id: Date.now(), firstName, lastName, email, password, role: role, createdAt: new Date().toISOString() };
     users.push(user);
     localStorage.setItem('jp_users', JSON.stringify(users));
     localStorage.setItem('jp_user',  JSON.stringify(user));

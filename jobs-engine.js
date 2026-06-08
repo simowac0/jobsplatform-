@@ -114,15 +114,17 @@
     var workMode= (city === 'Remote') ? 'Remote' : pick(rng, MODES);
     var response= pick(rng, RESPS);
     var company = pick(rng, pool.companies);
-    var title   = pick(rng, pool.titles);
+    var titleIdx = Math.floor(rng() * pool.titles.length);
+    var title   = pool.titles[titleIdx];
     var logo    = company.split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2) || 'JP';
     var featured= rng() < 0.04;
-    var desc    = pick(rng, DESCS);
+    var descIdx = Math.floor(rng() * DESCS.length);
+    var desc    = DESCS[descIdx];
     // idx=0 → oldest, idx=TOTAL-1 → newest
     var maxAgeMs = (days+1) * 86400000;
     var ageMs    = Math.floor((1 - (idx+1)/TOTAL) * maxAgeMs);
     var postedAt = new Date(Date.now() - ageMs).toISOString();
-    return { id:idx+10000, title:title, company:company, logo:logo, color:pool.color, location:city, type:type, salaryMin:salMin, salary:salary, category:catKey, workMode:workMode, response:response, featured:featured, postedAt:postedAt, desc:desc };
+    return { id:idx+10000, title:title, company:company, logo:logo, color:pool.color, location:city, type:type, salaryMin:salMin, salary:salary, category:catKey, workMode:workMode, response:response, featured:featured, postedAt:postedAt, desc:desc, _titleIdx:titleIdx % 5, _descIdx:descIdx % 5 };
   };
 
   window.TOTAL_AVAILABLE_JOBS = TOTAL;

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign In – JobsPlatform</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="jobbank-theme.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -138,14 +139,14 @@
         <span class="logo-text">Jobs<strong>Platform</strong></span>
       </a>
       <nav class="nav-links">
-        <a href="jobs.html">Jobs</a>
-        <a href="jobs.html?tab=companies">Companies</a>
+        <a href="jobs.html" data-t="nav_jobs">Jobs</a>
+        <a href="jobs.html?tab=companies" data-t="nav_companies">Companies</a>
       </nav>
       <div class="nav-right">
         <span class="lang-btn"><i class="fa-solid fa-globe lang-globe"></i><span class="lang-code">GB</span><span class="lang-label">EN</span><i class="fa-solid fa-chevron-down lang-caret"></i></span>
         <div class="nav-auth-zone" style="display:flex;align-items:center;gap:10px;">
-          <a href="login.html" class="btn-ghost">Sign In</a>
-          <a href="login.html?tab=register&role=employer" class="btn-primary">Post a Job</a>
+          <a href="login.html" class="btn-ghost" data-t="nav_signin">Sign In</a>
+          <a href="login.html?tab=register&role=employer" class="btn-primary" data-t="nav_post">Post a Job</a>
         </div>
       </div>
       <button class="hamburger" id="hamburger"><i class="fa-solid fa-bars"></i></button>
@@ -166,18 +167,18 @@
 
       <!-- TABS -->
       <div class="auth-tabs">
-        <button class="auth-tab active" id="tabSignin"   onclick="switchTab('signin')">Sign In</button>
-        <button class="auth-tab"        id="tabRegister" onclick="switchTab('register')">Create Account</button>
+        <button class="auth-tab active" id="tabSignin"   onclick="switchTab('signin')" data-t="tab_signin">Sign In</button>
+        <button class="auth-tab"        id="tabRegister" onclick="switchTab('register')" data-t="tab_reg">Create Account</button>
       </div>
 
       <!-- ══ SIGN IN ══ -->
       <div id="signinBlock">
         <div class="social-btns">
           <button class="social-btn" onclick="socialLogin('google')">
-            <i class="fa-brands fa-google" style="color:#EA4335;"></i> Continue with Google
+            <i class="fa-brands fa-google" style="color:#EA4335;"></i> <span data-ui="google_btn">Continue with Google</span>
           </button>
         </div>
-        <div class="divider">or sign in with email</div>
+        <div class="divider" data-ui="or_signin">or sign in with email</div>
 
         <form onsubmit="handleLogin(event)">
           <div class="form-group">
@@ -197,7 +198,7 @@
           </div>
           <div class="form-msg" id="loginMsg"></div>
           <button type="submit" class="btn-submit">
-            <span id="loginTxt">Sign In</span>
+            <span id="loginTxt" data-ui="sign_in_btn">Sign In</span>
             <span id="loginSpin" style="display:none;"><i class="fa-solid fa-spinner fa-spin"></i></span>
           </button>
         </form>
@@ -208,10 +209,10 @@
       <div id="registerBlock" style="display:none;">
         <div class="social-btns">
           <button class="social-btn" onclick="socialLogin('google')">
-            <i class="fa-brands fa-google" style="color:#EA4335;"></i> Continue with Google
+            <i class="fa-brands fa-google" style="color:#EA4335;"></i> <span data-ui="google_btn">Continue with Google</span>
           </button>
         </div>
-        <div class="divider">or create account with email</div>
+        <div class="divider" data-ui="or_register">or create account with email</div>
 
         <div class="form-row">
           <div class="form-group">
@@ -246,7 +247,7 @@
         </div>
         <div class="form-msg" id="regMsg"></div>
         <button class="btn-submit" onclick="handleRegister()">
-          <span id="regTxt">Create Account</span>
+          <span id="regTxt" data-ui="create_account">Create Account</span>
           <span id="regSpin" style="display:none;"><i class="fa-solid fa-spinner fa-spin"></i></span>
         </button>
         <div class="auth-footer">Already have an account? <a href="#" onclick="switchTab('signin');return false;">Sign in</a></div>
@@ -262,6 +263,8 @@
     </div>
   </div>
 
+  <script src="site-config.js"></script>
+  <script src="i18n.js"></script>
   <script src="main.js"></script>
   <script src="auth.js"></script>
 </body>

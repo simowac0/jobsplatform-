@@ -1,5 +1,6 @@
 // ─── HELPERS ─────────────────────────────────────────────────
 function timeAgo(iso) {
+  if (window.jpTimeAgo) return window.jpTimeAgo(iso);
   var s = Math.floor((Date.now() - new Date(iso)) / 1000);
   if (s < 60)     return 'Just now';
   if (s < 3600)   return Math.floor(s/60) + ' min ago';
@@ -7,6 +8,11 @@ function timeAgo(iso) {
   if (s < 172800) return '1 day ago';
   return Math.floor(s/86400) + ' days ago';
 }
+
+function getSavedJobs() {
+  try { return JSON.parse(localStorage.getItem('jp_saved_jobs') || '[]'); } catch(e) { return []; }
+}
+function isJobSaved(id) { return getSavedJobs().indexOf(id) >= 0; }
 function isNew(iso) { return (Date.now() - new Date(iso)) < 2*3600000; }
 
 // ─── STATE ───────────────────────────────────────────────────
@@ -108,41 +114,43 @@ function renderPage(highlight) {
   }
 
   document.getElementById('jobsCount').innerHTML =
-    'Showing <strong>' + ((currentPage-1)*JOBS_PER_PAGE+1) + '–' +
+    window.jpT('showing') + ' <strong>' + ((currentPage-1)*JOBS_PER_PAGE+1) + '–' +
     Math.min(currentPage*JOBS_PER_PAGE, totalShown) +
-    '</strong> of <strong>' + totalShown.toLocaleString() + '</strong> jobs';
+    '</strong> ' + window.jpT('of') + ' <strong>' + totalShown.toLocaleString() + '</strong> ' + window.jpT('jobs_word');
 
   if (!pageJobs.length) {
-    list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--muted);"><i class="fa-solid fa-magnifying-glass" style="font-size:48px;opacity:.3;display:block;margin-bottom:16px;"></i><h3 style="margin-bottom:8px;">No jobs found</h3><p>Try removing some filters.</p><button class="btn-ghost" style="margin-top:16px;" onclick="resetFilters()">Clear filters</button></div>';
+    list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--muted);"><i class="fa-solid fa-magnifying-glass" style="font-size:48px;opacity:.3;display:block;margin-bottom:16px;"></i><h3 style="margin-bottom:8px;">' + window.jpT('no_jobs') + '</h3><p>' + window.jpT('no_jobs_sub') + '</p><button class="btn-ghost" style="margin-top:16px;" onclick="resetFilters()">' + window.jpT('clear_filters') + '</button></div>';
     document.getElementById('pagination').innerHTML = '';
     return;
   }
 
-  list.innerHTML = pageJobs.map(function(j) {
+  list.innerHTML = pageJobs.map(function(raw) {
+    var j = window.jpLocalizeJob ? window.jpLocalizeJob(raw) : raw;
     var hl = highlight.indexOf(j.id) >= 0;
+    var saved = isJobSaved(j.id);
     return '<div class="job-card ' + (j.featured?'featured':'') + ' ' + (hl?'job-new-anim':'') + '" style="cursor:pointer;" onclick="window.location.href=\'job.html?id='+j.id+'\'">' +
       '<div class="job-logo" style="background:'+j.color+'">'+j.logo+'</div>' +
       '<div class="job-body">' +
         '<div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:6px;">' +
-          (j.featured ? '<span class="featured-badge"><i class="fa-solid fa-star"></i> Featured</span>' : '') +
-          (isNew(j.postedAt) ? '<span class="new-badge"><i class="fa-solid fa-bolt"></i> New</span>' : '') +
-          (hl ? '<span class="live-badge"><i class="fa-solid fa-circle"></i> Just posted</span>' : '') +
+          (j.featured ? '<span class="featured-badge"><i class="fa-solid fa-star"></i> ' + window.jpT('featured') + '</span>' : '') +
+          (isNew(j.postedAt) ? '<span class="new-badge"><i class="fa-solid fa-bolt"></i> ' + window.jpT('new_badge') + '</span>' : '') +
+          (hl ? '<span class="live-badge"><i class="fa-solid fa-circle"></i> ' + window.jpT('just_posted') + '</span>' : '') +
         '</div>' +
         '<div class="job-title">'+j.title+'</div>' +
-        '<div class="job-company">'+j.company+' <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></div>' +
+        '<div class="job-company">'+j.company+' <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> ' + window.jpT('verified') + '</span></div>' +
         '<div class="job-tags">' +
           '<span class="job-tag"><i class="fa-solid fa-location-dot"></i> '+j.location+'</span>' +
-          '<span class="job-tag"><i class="fa-solid fa-clock"></i> '+j.type+'</span>' +
+          '<span class="job-tag"><i class="fa-solid fa-clock"></i> '+j.typeLabel+'</span>' +
           '<span class="job-tag"><i class="fa-solid fa-sterling-sign"></i> '+j.salary+'</span>' +
-          '<span class="job-tag '+(j.workMode==='Remote'?'green':'')+'"><i class="fa-solid fa-'+(j.workMode==='Remote'?'laptop-house':j.workMode==='Hybrid'?'house-laptop':'building')+'"></i> '+j.workMode+'</span>' +
-          '<span class="job-tag green"><i class="fa-solid fa-hourglass-half"></i> Replies in '+j.response+'h</span>' +
+          '<span class="job-tag '+(j.workMode==='Remote'?'green':'')+'"><i class="fa-solid fa-'+(j.workMode==='Remote'?'laptop-house':j.workMode==='Hybrid'?'house-laptop':'building')+'"></i> '+j.modeLabel+'</span>' +
+          '<span class="job-tag green"><i class="fa-solid fa-hourglass-half"></i> ' + window.jpT('replies_in') + ' '+j.response+'h</span>' +
         '</div>' +
         '<p style="font-size:14px;color:var(--muted);margin-bottom:14px;line-height:1.5;">'+j.desc+'</p>' +
         '<div class="job-footer">' +
           '<span class="job-posted"><i class="fa-regular fa-clock"></i> '+timeAgo(j.postedAt)+'</span>' +
           '<div class="job-actions">' +
-            '<button class="btn-save" id="save-'+j.id+'" onclick="event.stopPropagation();toggleSave('+j.id+',this)"><i class="fa-regular fa-bookmark"></i> <span data-t="save">Save</span></button>' +
-            '<a href="job.html?id='+j.id+'" class="btn-primary" onclick="event.stopPropagation()" data-t="apply">Apply Now</a>' +
+            '<button class="btn-save'+(saved?' saved':'')+'" id="save-'+j.id+'" onclick="event.stopPropagation();toggleSave('+j.id+',this)"><i class="'+(saved?'fa-solid':'fa-regular')+' fa-bookmark"></i> <span>'+(saved?window.jpT('saved'):window.jpT('save'))+'</span></button>' +
+            '<a href="job.html?id='+j.id+'" class="btn-primary" onclick="event.stopPropagation()">'+window.jpT('apply')+'</a>' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -176,7 +184,8 @@ function goPage(p) {
 }
 
 // ─── SORT ────────────────────────────────────────────────────
-document.getElementById('sortSelect').addEventListener('change', function() {
+var sortSelectEl = document.getElementById('sortSelect');
+if (sortSelectEl) sortSelectEl.addEventListener('change', function() {
   var v = this.value;
   if (filteredIds && filteredList.length) {
     if (v==='salary')   filteredList.sort(function(a,b){return b.salaryMin-a.salaryMin;});
@@ -243,10 +252,13 @@ document.addEventListener('click', function(e){ if(e.target.id==='applyModal') c
 
 // ─── SAVE ─────────────────────────────────────────────────────
 function toggleSave(id, btn) {
-  btn.classList.toggle('saved');
-  btn.innerHTML = btn.classList.contains('saved')
-    ? '<i class="fa-solid fa-bookmark"></i> <span data-t="saved">Saved</span>'
-    : '<i class="fa-regular fa-bookmark"></i> <span data-t="save">Save</span>';
+  var saved = getSavedJobs();
+  var idx = saved.indexOf(id);
+  if (idx >= 0) saved.splice(idx, 1); else saved.push(id);
+  localStorage.setItem('jp_saved_jobs', JSON.stringify(saved));
+  var isSaved = idx < 0;
+  btn.classList.toggle('saved', isSaved);
+  btn.innerHTML = '<i class="' + (isSaved ? 'fa-solid' : 'fa-regular') + ' fa-bookmark"></i> <span>' + (isSaved ? window.jpT('saved') : window.jpT('save')) + '</span>';
 }
 
 // ─── AUTO-SYNC ────────────────────────────────────────────────
@@ -264,8 +276,8 @@ var syncPoolIdx = 0;
 var syncLiveId  = 99000;
 
 function syncJobs() {
-  // Try real API
-  fetch('http://localhost:3000/api/jobs?since=' + encodeURIComponent(new Date(Date.now()-35000).toISOString()))
+  // Try real API (relative path works in prod and local)
+  fetch('/api/jobs?since=' + encodeURIComponent(new Date(Date.now()-35000).toISOString()))
     .then(function(r){return r.json();})
     .then(function(data){
       if (data.jobs && data.jobs.length) { injectLiveJobs(data.jobs); return; }
@@ -299,7 +311,7 @@ function injectLiveJobs(newJobs) {
 function showSyncToast(n) {
   var t = document.getElementById('syncToast');
   if (!t) { t=document.createElement('div'); t.id='syncToast'; t.className='sync-toast'; document.body.appendChild(t); }
-  t.innerHTML = '<i class="fa-solid fa-bolt"></i> ' + n + ' new job' + (n>1?'s':'') + ' just posted!';
+  t.innerHTML = '<i class="fa-solid fa-bolt"></i> ' + n + ' ' + (n>1?window.jpT('sync_news'):window.jpT('sync_new')) + ' ' + window.jpT('sync_posted');
   t.classList.add('show');
   setTimeout(function(){t.classList.remove('show');}, 4000);
 }
@@ -322,15 +334,57 @@ function updateCounts() {
 }
 
 // ─── SEARCH FORM ──────────────────────────────────────────────
-document.getElementById('searchForm').addEventListener('submit', function(e){e.preventDefault();filterJobs();});
-document.getElementById('searchQ').addEventListener('input',   function(){filterJobs();});
-document.getElementById('searchLoc').addEventListener('input', function(){filterJobs();});
+var searchForm = document.getElementById('searchForm');
+if (searchForm) {
+  searchForm.addEventListener('submit', function(e){e.preventDefault();filterJobs();});
+  var sq = document.getElementById('searchQ');
+  var sl = document.getElementById('searchLoc');
+  if (sq) sq.addEventListener('input', function(){filterJobs();});
+  if (sl) sl.addEventListener('input', function(){filterJobs();});
+}
+
+// ─── COMPANIES VIEW ───────────────────────────────────────────
+var COMPANIES_LIST = [
+  {name:'NHS Foundation Trust',logo:'NH',color:'#2563eb',jobs:1240},
+  {name:'Amazon Logistics',logo:'AM',color:'#f59e0b',jobs:890},
+  {name:'Tesco PLC',logo:'TE',color:'#16a34a',jobs:760},
+  {name:'BT Group',logo:'BT',color:'#7c3aed',jobs:540},
+  {name:'Monzo Bank',logo:'MO',color:'#f97316',jobs:320},
+  {name:'SunCare Group',logo:'SC',color:'#0891b2',jobs:480},
+  {name:'Deloitte UK',logo:'DE',color:'#374151',jobs:290},
+  {name:'Balfour Beatty',logo:'BB',color:'#dc2626',jobs:410},
+];
+
+function showCompaniesView() {
+  var layout = document.querySelector('.jobs-layout');
+  if (!layout) return;
+  layout.innerHTML = '<main class="jobs-main" style="grid-column:1/-1;">' +
+    '<div class="section-header" style="margin-bottom:28px;"><h1 data-ui="companies_h1">' + window.jpT('companies_h1') + '</h1><p data-ui="companies_sub">' + window.jpT('companies_sub') + '</p></div>' +
+    '<div class="categories-grid">' +
+    COMPANIES_LIST.map(function(c) {
+      return '<a href="jobs.html?q=' + encodeURIComponent(c.name) + '" class="cat-card">' +
+        '<div class="cat-icon" style="background:'+c.color+'">' + c.logo + '</div>' +
+        '<div class="cat-name">' + c.name + '</div>' +
+        '<div class="cat-count">' + c.jobs.toLocaleString() + ' ' + window.jpT('jobs_count_label') + '</div>' +
+        '<span class="verified-badge" style="margin-top:8px;"><i class="fa-solid fa-circle-check"></i> ' + window.jpT('verified') + '</span></a>';
+    }).join('') +
+    '</div></main>';
+  if (window.jpApplyUI) window.jpApplyUI();
+}
 
 // ─── URL PARAMS ───────────────────────────────────────────────
 var params = new URLSearchParams(window.location.search);
-if (params.get('q'))        document.getElementById('searchQ').value   = params.get('q');
-if (params.get('location')) document.getElementById('searchLoc').value = params.get('location');
-if (params.get('category')) document.getElementById('searchQ').value   = params.get('category');
+var searchQEl = document.getElementById('searchQ');
+var searchLocEl = document.getElementById('searchLoc');
+if (params.get('q') && searchQEl)        searchQEl.value   = params.get('q');
+if (params.get('location') && searchLocEl) searchLocEl.value = params.get('location');
+if (params.get('category')) {
+  var catVal = params.get('category');
+  var catInput = document.querySelector('input[name="cat"][value="'+catVal+'"]');
+  if (catInput) { catInput.checked = true; }
+  else if (searchQEl) { searchQEl.value = catVal; }
+}
+if (params.get('tab') === 'companies') { showCompaniesView(); }
 
 // ─── LIVE INDICATOR ───────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', function() {
@@ -338,7 +392,7 @@ window.addEventListener('DOMContentLoaded', function() {
   if (tb) {
     var ind = document.createElement('div');
     ind.className='live-indicator';
-    ind.innerHTML='<span class="live-dot"></span> Live';
+    ind.innerHTML='<span class="live-dot"></span> ' + (window.jpT ? window.jpT('live') : 'Live');
     tb.appendChild(ind);
   }
   // Check if returning from login with pending apply
@@ -350,16 +404,29 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 // ─── INIT ─────────────────────────────────────────────────────
-updateCounts();
-if (params.get('q') || params.get('category') || params.get('location')) {
-  filterJobs();
-} else {
-  renderPage();
+window.onJpLangChange = function() {
+  if (params.get('tab') === 'companies') showCompaniesView();
+  else renderPage();
+  updateJobsHeroSub();
+  var sortLbl = document.querySelector('.jobs-sort label');
+  if (sortLbl) sortLbl.textContent = window.jpT('sort_label');
+};
+
+function updateJobsHeroSub() {
+  var heroSub = document.querySelector('[data-t="jobs_sub"]');
+  if (heroSub) heroSub.textContent = (total).toLocaleString() + ' ' + window.jpT('listings_active');
 }
 
-// Hero subtitle
-var heroSub = document.querySelector('[data-t="jobs_sub"]');
-if (heroSub) heroSub.textContent = (total).toLocaleString() + ' active listings · All salaries shown · Employers respond within 48h';
+if (window.jpRenderFilters) window.jpRenderFilters();
+updateCounts();
+if (params.get('tab') !== 'companies') {
+  if (params.get('q') || params.get('category') || params.get('location') || document.querySelector('input[name="cat"]:checked')) {
+    filterJobs();
+  } else {
+    renderPage();
+  }
+}
+updateJobsHeroSub();
 
 // Start auto-sync
 setInterval(syncJobs, 30000);

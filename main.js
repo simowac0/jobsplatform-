@@ -220,6 +220,10 @@ function applyLang(code) {
     sel.options[1] && (sel.options[1].text = L.sort_salary);
     sel.options[2] && (sel.options[2].text = L.sort_resp);
   }
+
+  // Extended UI translations (i18n.js)
+  if (window.jpApplyUI) window.jpApplyUI();
+  if (window.onJpLangChange) window.onJpLangChange();
 }
 
 function buildLangDropdown() {
@@ -319,8 +323,8 @@ function updateNavAuth() {
         '<i class="fa-solid fa-chevron-down" style="font-size:10px;color:var(--muted);"></i>' +
       '</div>' +
       '<div class="nav-user-menu" id="navUserMenu">' +
-        '<a href="jobs.html"><i class="fa-solid fa-magnifying-glass"></i> Browse Jobs</a>' +
-        '<a href="#" onclick="signOut();return false;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>' +
+        '<a href="jobs.html"><i class="fa-solid fa-magnifying-glass"></i> ' + (window.jpT ? window.jpT('browse_jobs') : 'Browse Jobs') + '</a>' +
+        '<a href="#" onclick="signOut();return false;"><i class="fa-solid fa-right-from-bracket"></i> ' + (window.jpT ? window.jpT('sign_out') : 'Sign Out') + '</a>' +
       '</div>';
     navRight.appendChild(zone);
   } else {

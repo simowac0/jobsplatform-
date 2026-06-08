@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Job Details – JobsPlatform</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="jobbank-theme.css" />
   <link rel="stylesheet" href="job.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -43,7 +44,7 @@
   <div id="jobDetailView">
     <div class="jd-container container">
 
-      <a href="jobs.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to jobs</a>
+      <a href="jobs.html" class="back-link" data-ui="back_jobs"><i class="fa-solid fa-arrow-left"></i> Back to jobs</a>
 
       <div class="jd-layout">
 
@@ -97,7 +98,7 @@
           <!-- About the company -->
           <div class="jd-card">
             <div class="jd-section-title">
-              <i class="fa-solid fa-building" style="color:#2563eb;"></i> About <span id="jdAboutCompanyName">the Company</span>
+              <i class="fa-solid fa-building" style="color:#2563eb;"></i> <span data-ui="about_company">About</span> <span id="jdAboutCompanyName">the Company</span>
             </div>
             <p id="jdAbout" style="color:var(--muted);line-height:1.8;font-size:15px;"></p>
             <div class="jd-company-stats" id="jdCompanyStats"></div>
@@ -106,7 +107,7 @@
           <!-- Contract details -->
           <div class="jd-card">
             <div class="jd-section-title">
-              <i class="fa-solid fa-file-contract" style="color:#7c3aed;"></i> Contract &amp; Hours
+              <i class="fa-solid fa-file-contract" style="color:#7c3aed;"></i> <span data-ui="contract_hours">Contract &amp; Hours</span>
             </div>
             <div class="jd-contract-grid" id="jdContractGrid"></div>
           </div>
@@ -114,7 +115,7 @@
           <!-- Description card -->
           <div class="jd-card">
             <div class="jd-section-title">
-              <i class="fa-regular fa-file-lines" style="color:#f97316;"></i> Job Description
+              <i class="fa-regular fa-file-lines" style="color:#f97316;"></i> <span data-ui="job_desc">Job Description</span>
             </div>
             <div id="jdDesc"></div>
           </div>
@@ -122,7 +123,7 @@
           <!-- Requirements card -->
           <div class="jd-card">
             <div class="jd-section-title">
-              <i class="fa-solid fa-circle-check" style="color:#16a34a;"></i> Requirements
+              <i class="fa-solid fa-circle-check" style="color:#16a34a;"></i> <span data-ui="requirements">Requirements</span>
             </div>
             <ul class="jd-list" id="jdRequirements"></ul>
           </div>
@@ -130,7 +131,7 @@
           <!-- What we're looking for -->
           <div class="jd-card">
             <div class="jd-section-title">
-              <i class="fa-solid fa-star" style="color:#f97316;"></i> What We're Looking For
+              <i class="fa-solid fa-star" style="color:#f97316;"></i> <span data-ui="looking_for">What We're Looking For</span>
             </div>
             <p id="jdLookingFor" style="color:var(--muted);line-height:1.8;font-size:15px;margin-bottom:16px;"></p>
             <div class="jd-skills-wrap" id="jdSkills"></div>
@@ -139,7 +140,7 @@
           <!-- Benefits card -->
           <div class="jd-card">
             <div class="jd-section-title">
-              <i class="fa-regular fa-calendar-check" style="color:#2563eb;"></i> Benefits &amp; Perks
+              <i class="fa-regular fa-calendar-check" style="color:#2563eb;"></i> <span data-ui="benefits">Benefits &amp; Perks</span>
             </div>
             <div class="jd-benefits-grid" id="jdBenefits"></div>
           </div>
@@ -155,15 +156,15 @@
           <!-- Apply card -->
           <div class="jd-card jd-apply-card">
             <button class="btn-dark-pill" style="width:100%;margin-bottom:12px;" onclick="startApply()">
-              <i class="fa-solid fa-paper-plane"></i> Apply now
+              <i class="fa-solid fa-paper-plane"></i> <span data-ui="apply_now">Apply now</span>
             </button>
-            <p style="text-align:center;font-size:13px;color:var(--muted);">Quick application – 5 minutes maximum</p>
+            <p style="text-align:center;font-size:13px;color:var(--muted);" data-ui="quick_apply_sub">Quick application – 5 minutes maximum</p>
           </div>
 
           <!-- Need help card -->
           <div class="jd-card jd-help-card">
-            <h4 style="font-weight:700;margin-bottom:6px;">Need help?</h4>
-            <p style="font-size:14px;color:var(--muted);">Our team is available to assist you with your application.</p>
+            <h4 style="font-weight:700;margin-bottom:6px;" data-ui="need_help">Need help?</h4>
+            <p style="font-size:14px;color:var(--muted);" data-ui="need_help_sub">Our team is available to assist you with your application.</p>
           </div>
 
         </aside>
@@ -175,7 +176,7 @@
   <div id="applyFormView" style="display:none;">
     <div class="jd-container container">
 
-      <a href="#" onclick="showDetailView();return false;" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to job</a>
+      <a href="#" onclick="showDetailView();return false;" class="back-link" data-ui="back_job"><i class="fa-solid fa-arrow-left"></i> Back to job</a>
 
       <div class="jd-layout">
 
@@ -185,31 +186,31 @@
             <div class="jd-star-badge" style="background:#2563eb;"><i class="fa-solid fa-paper-plane"></i></div>
 
             <!-- Quick apply badge -->
-            <div class="quick-apply-badge"><i class="fa-solid fa-bolt"></i> Quick apply</div>
+            <div class="quick-apply-badge"><i class="fa-solid fa-bolt"></i> <span data-ui="quick_apply">Quick apply</span></div>
 
-            <h2 style="font-size:24px;font-weight:800;margin-bottom:8px;">Apply to this position</h2>
-            <p style="font-size:14px;color:var(--muted);margin-bottom:28px;">Complete the steps below to submit your application. ID verification is required.</p>
+            <h2 style="font-size:24px;font-weight:800;margin-bottom:8px;" data-ui="apply_title">Apply to this position</h2>
+            <p style="font-size:14px;color:var(--muted);margin-bottom:28px;" data-ui="apply_sub">Complete the steps below to submit your application. ID verification is required.</p>
 
             <!-- Steps -->
             <div class="apply-steps">
               <div class="apply-step-item active" id="astep1">
                 <div class="apply-step-circle active">1</div>
-                <span>Personal Info</span>
+                <span data-ui="step_personal">Personal Info</span>
               </div>
               <div class="apply-step-line" id="aline1"></div>
               <div class="apply-step-item" id="astep2">
                 <div class="apply-step-circle">2</div>
-                <span>Documents</span>
+                <span data-ui="step_docs">Documents</span>
               </div>
               <div class="apply-step-line" id="aline2"></div>
               <div class="apply-step-item" id="astep3">
                 <div class="apply-step-circle">3</div>
-                <span>Selfie</span>
+                <span data-ui="step_face">Face ID</span>
               </div>
               <div class="apply-step-line" id="aline3"></div>
               <div class="apply-step-item" id="astep4">
                 <div class="apply-step-circle">4</div>
-                <span>Review</span>
+                <span data-ui="step_review">Review</span>
               </div>
             </div>
 
@@ -376,10 +377,10 @@
               </div>
             </div>
 
-            <!-- STEP 3: Selfie Liveness -->
+            <!-- STEP 3: Shopify-style KYC — liveness + video + photo -->
             <div id="applyStep3" style="display:none;">
-              <h3 style="font-size:18px;font-weight:700;margin-bottom:4px;">Face Verification</h3>
-              <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">Follow the on-screen instructions to verify your identity.</p>
+              <h3 style="font-size:18px;font-weight:700;margin-bottom:4px;" data-ui="face_title">Identity Verification (KYC)</h3>
+              <p style="font-size:14px;color:var(--muted);margin-bottom:16px;" data-ui="face_sub">Follow the on-screen instructions. We record a 10-second video and capture your photo.</p>
 
               <div class="selfie-frame-wrap" id="selfieCamWrap">
                 <!-- Top status bar -->
@@ -398,6 +399,7 @@
                 </div>
 
                 <video id="selfieCamVideo" autoplay playsinline muted style="display:none;position:absolute;width:100%;height:100%;object-fit:cover;border-radius:20px;"></video>
+                <video id="selfieVideoPreview" style="display:none;position:absolute;width:100%;height:100%;object-fit:cover;border-radius:20px;z-index:2;"></video>
                 <img id="selfieCapturedImg" style="display:none;position:absolute;width:100%;height:100%;object-fit:cover;border-radius:20px;" />
 
                 <!-- Face oval -->
@@ -461,14 +463,13 @@
               </div>
 
               <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap;">
-                <button class="kyc-action-btn kyc-capture-btn" id="selfieCaptureBtn" style="display:none;" onclick="selfieCamCapture()"><i class="fa-solid fa-circle"></i> Capture</button>
-                <button class="kyc-action-btn kyc-retry-btn" id="selfieRetryBtn" style="display:none;" onclick="selfieCamRetry()"><i class="fa-solid fa-rotate-left"></i> Retry</button>
+                <button class="kyc-action-btn kyc-retry-btn" id="selfieRetryBtn" style="display:none;" onclick="selfieCamRetry()"><i class="fa-solid fa-rotate-left"></i> <span data-ui="face_retry">Retry</span></button>
               </div>
 
               <div class="form-msg" id="applyMsg3s"></div>
               <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
                 <button class="btn-ghost" style="padding:12px 24px;" onclick="applyGoStep(2)">← Back</button>
-                <button class="btn-dark-pill" id="selfieNextBtn" style="width:auto;padding:14px 32px;display:none;" onclick="applyStep4()">Continue →</button>
+                <button class="btn-dark-pill" id="selfieNextBtn" style="width:auto;padding:14px 32px;display:none;" onclick="applyStep4()"><span data-ui="face_continue">Continue</span> →</button>
               </div>
             </div>
 
@@ -497,9 +498,9 @@
             <!-- SUCCESS -->
             <div id="applySuccess" style="display:none;text-align:center;padding:40px 0;">
               <div style="font-size:64px;color:var(--green);margin-bottom:16px;"><i class="fa-solid fa-circle-check"></i></div>
-              <h3 style="font-size:22px;font-weight:800;margin-bottom:8px;">Application Submitted!</h3>
-              <p style="color:var(--muted);margin-bottom:24px;">The employer will respond within <strong>48 hours</strong>. Good luck!</p>
-              <a href="jobs.html" class="btn-dark-pill" style="display:inline-flex;justify-content:center;padding:14px 32px;">Browse More Jobs</a>
+              <h3 style="font-size:22px;font-weight:800;margin-bottom:8px;" data-ui="success_title">Application Submitted!</h3>
+              <p style="color:var(--muted);margin-bottom:24px;" data-ui="success_sub">The employer will respond within <strong>48 hours</strong>. Good luck!</p>
+              <a href="jobs.html" class="btn-dark-pill" style="display:inline-flex;justify-content:center;padding:14px 32px;" data-ui="browse_more">Browse More Jobs</a>
             </div>
 
           </div>
@@ -508,7 +509,7 @@
         <!-- APPLY SIDEBAR -->
         <aside class="jd-sidebar">
           <div class="jd-card">
-            <div class="jd-id-title" style="color:var(--blue);"><i class="fa-solid fa-briefcase"></i> Job details</div>
+            <div class="jd-id-title" style="color:var(--blue);"><i class="fa-solid fa-briefcase"></i> <span data-ui="job_details">Job details</span></div>
             <div style="display:flex;align-items:center;gap:12px;margin:14px 0 16px;">
               <div class="jd-logo-sm" id="apSidebarLogo">JP</div>
               <div>
@@ -542,14 +543,17 @@
       <div class="sticky-right">
         <div class="sticky-salary" id="stickySalary">—</div>
         <button class="btn-dark-pill sticky-btn" onclick="startApply()">
-          <i class="fa-solid fa-paper-plane"></i> Apply now
+          <i class="fa-solid fa-paper-plane"></i> <span data-ui="apply_now">Apply now</span>
         </button>
       </div>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="site-config.js"></script>
   <script src="config.js"></script>
   <script src="webhook.js"></script>
+  <script src="i18n.js"></script>
   <script src="main.js"></script>
   <script src="jobs-engine.js"></script>
   <script src="job.js"></script>

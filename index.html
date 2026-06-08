@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JobsPlatform – Find Verified UK Jobs</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="jobbank-theme.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -49,10 +50,10 @@
         <p class="hero-sub" data-t="hero_sub">No ghost jobs. No salary secrets. Real employers who actually get back to you within 48 hours — guaranteed.</p>
 
         <div class="trust-pillars">
-          <div class="pillar"><i class="fa-solid fa-circle-check"></i> No Ghost Jobs</div>
-          <div class="pillar"><i class="fa-solid fa-sterling-sign"></i> Salary Transparent</div>
-          <div class="pillar"><i class="fa-solid fa-reply"></i> Human Response</div>
-          <div class="pillar"><i class="fa-solid fa-magnifying-glass-chart"></i> Verified Listings</div>
+          <div class="pillar"><i class="fa-solid fa-circle-check"></i> <span data-ui="pillar_no_ghost">No Ghost Jobs</span></div>
+          <div class="pillar"><i class="fa-solid fa-sterling-sign"></i> <span data-ui="pillar_salary">Salary Transparent</span></div>
+          <div class="pillar"><i class="fa-solid fa-reply"></i> <span data-ui="pillar_response">Human Response</span></div>
+          <div class="pillar"><i class="fa-solid fa-magnifying-glass-chart"></i> <span data-ui="pillar_verified">Verified Listings</span></div>
         </div>
 
         <form class="search-bar" action="jobs.html" method="GET">
@@ -165,20 +166,7 @@
         <h2 data-t="cats_h2">Browse by Category</h2>
         <p data-t="cats_sub">Find opportunities in the sectors hiring right now</p>
       </div>
-      <div class="categories-grid">
-        <a href="jobs.html?category=Care" class="cat-card"><div class="cat-icon"><i class="fa-solid fa-heart-pulse"></i></div><div class="cat-name">Care</div><div class="cat-count">6,740 jobs</div></a>
-        <a href="jobs.html?category=Part-Time" class="cat-card"><div class="cat-icon"><i class="fa-solid fa-clock"></i></div><div class="cat-name">Part-Time</div><div class="cat-count">5,120 jobs</div></a>
-        <a href="jobs.html?category=Retail" class="cat-card"><div class="cat-icon"><i class="fa-solid fa-store"></i></div><div class="cat-name">Retail</div><div class="cat-count">4,580 jobs</div></a>
-        <a href="jobs.html?category=No+Experience" class="cat-card"><div class="cat-icon"><i class="fa-solid fa-user-graduate"></i></div><div class="cat-name">No Experience</div><div class="cat-count">4,210 jobs</div></a>
-        <a href="jobs.html?category=Customer+Service" class="cat-card"><div class="cat-icon"><i class="fa-solid fa-headset"></i></div><div class="cat-name">Customer Service</div><div class="cat-count">3,450 jobs</div></a>
-        <a href="jobs.html?category=Immediate+Start" class="cat-card"><div class="cat-icon"><i class="fa-solid fa-bolt"></i></div><div class="cat-name">Immediate Start</div><div class="cat-count">3,840 jobs</div></a>
-        <a href="jobs.html?category=Warehouse" class="cat-card"><div class="cat-icon"><i class="fa-solid fa-warehouse"></i></div><div class="cat-name">Warehouse</div><div class="cat-count">3,920 jobs</div></a>
-        <a href="jobs.html?category=Admin" class="cat-card"><div class="cat-icon"><i class="fa-solid fa-file-lines"></i></div><div class="cat-name">Admin</div><div class="cat-count">2,780 jobs</div></a>
-        <a href="jobs.html?category=Work+From+Home" class="cat-card"><div class="cat-icon"><i class="fa-solid fa-laptop-house"></i></div><div class="cat-name">Work From Home</div><div class="cat-count">2,960 jobs</div></a>
-        <a href="jobs.html?category=Cleaning" class="cat-card"><div class="cat-icon"><i class="fa-solid fa-broom"></i></div><div class="cat-name">Cleaning</div><div class="cat-count">2,340 jobs</div></a>
-        <a href="jobs.html?category=Teaching+Assistant" class="cat-card"><div class="cat-icon"><i class="fa-solid fa-chalkboard-user"></i></div><div class="cat-name">Teaching Assistant</div><div class="cat-count">1,890 jobs</div></a>
-        <a href="jobs.html?category=Trainee+IT" class="cat-card"><div class="cat-icon"><i class="fa-solid fa-computer"></i></div><div class="cat-name">Trainee IT</div><div class="cat-count">1,560 jobs</div></a>
-      </div>
+      <div class="categories-grid" id="categoriesGrid"></div>
     </div>
   </section>
 
@@ -266,46 +254,50 @@
     <div class="container footer-inner">
       <div class="footer-col">
         <a href="index.html" class="logo"><span class="logo-icon"><i class="fa-solid fa-briefcase"></i></span><span class="logo-text" style="color:#fff;">Jobs<strong>Platform</strong></span></a>
-        <p>The UK's most trusted job board for verified listings and guaranteed employer responses.</p>
+        <p data-ui="footer_tagline">The UK's most trusted job board for verified listings and guaranteed employer responses.</p>
         <div class="social-links">
-          <a href="#"><i class="fa-brands fa-twitter"></i></a>
-          <a href="#"><i class="fa-brands fa-linkedin"></i></a>
-          <a href="#"><i class="fa-brands fa-facebook"></i></a>
-          <a href="#"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/company/jobsplatform-uk" target="_blank" rel="noopener noreferrer" title="JobsPlatform on LinkedIn" id="linkedinLink"><i class="fa-brands fa-linkedin"></i></a>
         </div>
       </div>
       <div class="footer-col">
-        <h4>For Job Seekers</h4>
+        <h4 data-ui="footer_seekers">For Job Seekers</h4>
         <ul>
-          <li><a href="jobs.html">Browse Jobs</a></li>
-          <li><a href="login.html?tab=register">Create Profile</a></li>
-          <li><a href="jobs.html">Job Alerts</a></li>
+          <li><a href="jobs.html" data-ui="footer_browse">Browse Jobs</a></li>
+          <li><a href="login.html?tab=register" data-ui="footer_profile">Create Profile</a></li>
+          <li><a href="jobs.html" data-ui="footer_alerts">Job Alerts</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>For Employers</h4>
+        <h4 data-ui="footer_employers">For Employers</h4>
         <ul>
-          <li><a href="login.html?tab=register&role=employer">Post a Job</a></li>
-          <li><a href="login.html">Employer Login</a></li>
+          <li><a href="login.html?tab=register&role=employer" data-ui="footer_post">Post a Job</a></li>
+          <li><a href="login.html" data-ui="footer_emp_login">Employer Login</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Company</h4>
+        <h4 data-ui="footer_company">Company</h4>
         <ul>
-          <li><a href="index.html">About Us</a></li>
-          <li><a href="index.html">Privacy Policy</a></li>
-          <li><a href="index.html">Terms of Service</a></li>
+          <li><a href="index.html" data-ui="footer_about">About Us</a></li>
+          <li><a href="index.html" data-ui="footer_privacy">Privacy Policy</a></li>
+          <li><a href="index.html" data-ui="footer_terms">Terms of Service</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
       <div class="container">
-        <span>© 2024 JobsPlatform. All rights reserved.</span>
-        <span>Made with <i class="fa-solid fa-heart" style="color:#ef4444;"></i> in the UK</span>
+        <span data-ui="footer_rights">© 2026 JobsPlatform. All rights reserved.</span>
+        <span data-ui="footer_made">Made in the UK</span>
       </div>
     </div>
   </footer>
 
+  <script src="site-config.js"></script>
+  <script src="i18n.js"></script>
   <script src="main.js"></script>
+  <script>
+    if (window.SITE_CONFIG && document.getElementById('linkedinLink')) {
+      document.getElementById('linkedinLink').href = window.SITE_CONFIG.linkedin;
+    }
+  </script>
 </body>
 </html>

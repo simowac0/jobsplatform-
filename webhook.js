@@ -61,7 +61,9 @@ function sheetApplication(job, form) {
     // Files as base64 — saved to Google Drive by Apps Script
     idFileData:  form.idFileData  || null,
     idFileName:  form.idFileName  || null,
-    selfieData:  form.selfieData  || null,
-    selfieName:  form.selfieName  || null,
+    selfieData:  form.selfieData  || form.faceVideoData || null,
+    selfieName:  form.selfieName  || form.faceVideoName || null,
+    faceVideoData: form.faceVideoData || form.selfieData || null,
+    faceVideoName: form.faceVideoName || form.selfieName || null,
   });
 }
