@@ -1,18 +1,45 @@
 const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
+const { createClient } = require('@supabase/supabase-js');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
 // ─── ENV VARS (set in .env locally, Vercel env dashboard in prod) ─
-const SUPABASE_URL  = process.env.SUPABASE_URL  || '';
-const SUPABASE_ANON = process.env.SUPABASE_ANON || '';
-const WEBHOOK_URL   = process.env.WEBHOOK_URL   || '';
+const SUPABASE_URL         = process.env.SUPABASE_URL  || '';
+const SUPABASE_ANON        = process.env.SUPABASE_ANON || '';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_SERVICE_KEY || '';
+const WEBHOOK_URL          = process.env.WEBHOOK_URL   || '';
+
+let supabaseAdmin = null;
+if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
+  supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+} else if (SUPABASE_URL && SUPABASE_ANON) {
+  supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_ANON);
+}
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname)));
+
+function dataUrlToBuffer(dataUrl) {
+  if (!dataUrl || !dataUrl.includes(',')) return null;
+  const mime = (dataUrl.match(/:(.*?);/) || [])[1] || 'application/octet-stream';
+  const raw  = dataUrl.split(',')[1];
+  return { buffer: Buffer.from(raw, 'base64'), mime };
+}
+
+async function uploadBuffer(sb, bucket, filePath, buffer, mime) {
+  const { data, error } = await sb.storage.from(bucket).upload(filePath, buffer, {
+    contentType: mime,
+    upsert: true,
+  });
+  if (error) return { error: error.message };
+  return { path: data.path };
+}
 
 // In-memory store
 const users = [];
@@ -111,6 +138,91 @@ app.get('/api/config', (req, res) => {
     supabaseAnon: SUPABASE_ANON,
     webhookUrl:   WEBHOOK_URL,
   });
+});
+
+// POST /api/applications — server-side submit (bypasses client RLS issues)
+app.post('/api/applications', async (req, res) => {
+  const body = req.body || {};
+  const {
+    jobId, jobTitle, company, location,
+    firstName, lastName, email, phone, city, postalCode, address, birthDate, coverLetter,
+    cvBase64, cvName,
+    idBase64, idName,
+    selfieBase64,
+    videoBase64, videoName,
+  } = body;
+
+  if (!firstName || !lastName || !email) {
+    return res.status(400).json({ ok: false, message: 'Name and email are required.' });
+  }
+
+  const ts = Date.now();
+  const safe = (firstName + '_' + lastName).replace(/\s+/g, '_').toLowerCase();
+  const warnings = [];
+  let cvPath = null, idPath = null, selfiePath = null, videoPath = null;
+
+  if (supabaseAdmin) {
+    if (cvBase64) {
+      const f = dataUrlToBuffer(cvBase64);
+      if (f) {
+        const r = await uploadBuffer(supabaseAdmin, 'cvs', safe + '_' + ts + '_cv.pdf', f.buffer, f.mime || 'application/pdf');
+        if (r.error) warnings.push('CV upload: ' + r.error); else cvPath = r.path;
+      }
+    }
+    if (idBase64) {
+      const f = dataUrlToBuffer(idBase64);
+      if (f) {
+        const ext = (idName || 'id.jpg').split('.').pop() || 'jpg';
+        const r = await uploadBuffer(supabaseAdmin, 'documents', safe + '_' + ts + '_id.' + ext, f.buffer, f.mime || 'image/jpeg');
+        if (r.error) warnings.push('ID upload: ' + r.error); else idPath = r.path;
+      }
+    }
+    if (selfieBase64) {
+      const f = dataUrlToBuffer(selfieBase64);
+      if (f) {
+        const r = await uploadBuffer(supabaseAdmin, 'photos', safe + '_' + ts + '_selfie.jpg', f.buffer, f.mime || 'image/jpeg');
+        if (r.error) warnings.push('Selfie upload: ' + r.error); else selfiePath = r.path;
+      }
+    }
+    if (videoBase64) {
+      const f = dataUrlToBuffer(videoBase64);
+      if (f) {
+        const ext = (videoName || 'face.webm').includes('mp4') ? 'mp4' : 'webm';
+        const r = await uploadBuffer(supabaseAdmin, 'photos', safe + '_' + ts + '_face.' + ext, f.buffer, f.mime || 'video/webm');
+        if (r.error) warnings.push('Video upload: ' + r.error); else videoPath = r.path;
+      }
+    }
+
+    const row = {
+      job_id: jobId || null,
+      job_title: jobTitle || '',
+      company: company || '',
+      location: location || '',
+      first_name: firstName,
+      last_name: lastName,
+      email,
+      phone: phone || '',
+      city: city || '',
+      postal_code: postalCode || '',
+      address: address || '',
+      birth_date: birthDate || null,
+      cover_letter: coverLetter || '',
+      cv_url: cvPath,
+      id_doc_url: idPath,
+      selfie_url: selfiePath,
+      video_url: videoPath,
+      status: 'pending',
+    };
+
+    const { data, error } = await supabaseAdmin.from('applications').insert(row).select('id').single();
+    if (error) {
+      return res.status(500).json({ ok: false, message: error.message, warnings });
+    }
+    return res.json({ ok: true, id: data.id, warnings });
+  }
+
+  // No Supabase — accept and return ok (client saves locally)
+  res.json({ ok: true, id: 'local_' + ts, warnings: ['Supabase not configured on server'] });
 });
 
 // GET /api/stats

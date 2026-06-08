@@ -1064,114 +1064,76 @@ async function submitApply() {
 
   var cvFile = document.getElementById('apCvFile').files[0];
   var idFile = document.getElementById('apIdFile').files[0];
-
-  // Wait for Supabase init (config.js)
-  for (var _w = 0; _w < 30; _w++) { if (window.sb !== undefined) break; await new Promise(function(r){setTimeout(r,100);}); }
-
-  var ts = Date.now();
   var safeName = (fn + '_' + ln).replace(/\s+/g, '_').toLowerCase();
 
-  var cvPath       = null;
-  var idDocPath    = null;
-  var faceVideoPath = null;
-  var submitError  = false;
-
-  if (window.sb) {
-    if (cvFile) {
-      cvPath = await uploadToStorage('cvs', safeName + '_' + ts + '_cv.pdf', cvFile);
-    }
-
-    var idBlob = idFile ? idFile : (window._idCapturedDataUrl ? dataUrlToBlob(window._idCapturedDataUrl) : null);
-    if (idBlob) {
-      var idExt = idFile ? (idFile.name.split('.').pop() || 'jpg') : 'jpg';
-      idDocPath = await uploadToStorage('documents', safeName + '_' + ts + '_id.' + idExt, idBlob);
-    }
-
-    var selfiePhotoPath = null;
-    if (window._selfieCapturedDataUrl) {
-      var selfieBlob = dataUrlToBlob(window._selfieCapturedDataUrl);
-      selfiePhotoPath = await uploadToStorage('photos', safeName + '_' + ts + '_selfie.jpg', selfieBlob);
-    }
-    if (window._selfieVideoBlob) {
-      var vidExt = (window._selfieVideoBlob.type || '').includes('mp4') ? 'mp4' : 'webm';
-      faceVideoPath = await uploadToStorage('photos', safeName + '_' + ts + '_face.' + vidExt, window._selfieVideoBlob);
-    }
-
-    var { error: dbErr } = await window.sb.from('applications').insert({
-      job_id:         currentJob.id   || null,
-      job_title:      currentJob.title || '',
-      company:        currentJob.company || '',
-      location:       currentJob.location || '',
-      first_name:     fn,
-      last_name:      ln,
-      email:          em,
-      phone:          ph,
-      city:           city,
-      postal_code:    post,
-      address:        addr,
-      birth_date:     dob,
-      cover_letter:   cover,
-      cv_url:         cvPath,
-      id_doc_url:     idDocPath,
-      selfie_url:     selfiePhotoPath,
-      face_video_url: faceVideoPath,
-      status:         'pending',
+  var cvB64 = cvFile ? await toBase64(cvFile) : null;
+  var idB64 = idFile ? await toBase64(idFile) : (window._idCapturedDataUrl || null);
+  var idName = idFile ? idFile.name : safeName + '_id.jpg';
+  var selfieB64 = window._selfieCapturedDataUrl || null;
+  var videoB64 = null;
+  if (window._selfieVideoBlob) {
+    videoB64 = await new Promise(function(resolve) {
+      var reader = new FileReader();
+      reader.onload = function(e) { resolve(e.target.result); };
+      reader.onerror = function() { resolve(null); };
+      reader.readAsDataURL(window._selfieVideoBlob);
     });
-    if (dbErr) { console.warn('DB insert error:', dbErr.message); submitError = true; }
   }
 
-  // Google Sheets webhook
+  var payload = {
+    jobId: currentJob.id, jobTitle: currentJob.title, company: currentJob.company, location: currentJob.location,
+    firstName: fn, lastName: ln, email: em, phone: ph, city: city, postalCode: post, address: addr,
+    birthDate: dob, coverLetter: cover,
+    cvBase64: cvB64, cvName: cvFile ? cvFile.name : null,
+    idBase64: idB64, idName: idName,
+    selfieBase64: selfieB64,
+    videoBase64: videoB64, videoName: safeName + '_face.webm',
+  };
+
+  var submitOk = false;
+  try {
+    var resp = await fetch('/api/applications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    var result = await resp.json();
+    if (result.ok) {
+      submitOk = true;
+      if (result.warnings && result.warnings.length) console.warn('Apply warnings:', result.warnings);
+    } else {
+      showApplyMsg('applyMsg3', result.message || window.jpT('err_submit'), 'error');
+    }
+  } catch (err) {
+    showApplyMsg('applyMsg3', window.jpT('err_submit'), 'error');
+  }
+
   if (window.sheetApplication) {
-    var idB64 = null, idName = null, vidB64 = null, vidName = null;
-    if (idFile) {
-      idB64 = await toBase64(idFile);
-      idName = idFile.name;
-    } else if (window._idCapturedDataUrl) {
-      idB64 = window._idCapturedDataUrl;
-      idName = safeName + '_id.jpg';
-    }
-    var photoB64 = window._selfieCapturedDataUrl || null;
-    var photoName = safeName + '_selfie.jpg';
-    if (window._selfieVideoBlob) {
-      vidB64 = await new Promise(function(resolve) {
-        var reader = new FileReader();
-        reader.onload = function(e) { resolve(e.target.result); };
-        reader.onerror = function() { resolve(null); };
-        reader.readAsDataURL(window._selfieVideoBlob);
-      });
-      vidName = safeName + '_face.webm';
-    }
     sheetApplication(currentJob, {
       firstName: fn, lastName: ln, email: em, phone: ph,
       city: city, postalCode: post, address: addr, birthDate: dob,
-      coverLetter: cover, hasId: !!(idFile || window._idCapturedDataUrl),
-      hasSelfie: !!(window._selfieCapturedDataUrl && window._selfieVideoBlob),
+      coverLetter: cover, hasId: !!idB64,
+      hasSelfie: !!(selfieB64 && videoB64),
       idFileData: idB64, idFileName: idName,
-      selfieData: photoB64, selfieName: photoName,
-      faceVideoData: vidB64, faceVideoName: vidName,
+      selfieData: selfieB64, selfieName: safeName + '_selfie.jpg',
+      faceVideoData: videoB64, faceVideoName: safeName + '_face.webm',
     });
   }
 
-  // Save locally as backup
   var apps = JSON.parse(localStorage.getItem('jp_applications') || '[]');
   apps.push({
     jobId: currentJob.id, jobTitle: currentJob.title, company: currentJob.company,
     appliedAt: new Date().toISOString(), name: fn + ' ' + ln, email: em,
-    hasFaceVideo: !!window._selfieVideoBlob,
-    hasSelfiePhoto: !!window._selfieCapturedDataUrl,
+    hasFaceVideo: !!videoB64, hasSelfiePhoto: !!selfieB64,
   });
   localStorage.setItem('jp_applications', JSON.stringify(apps));
 
   document.getElementById('submitApplyTxt').style.display  = 'inline';
   document.getElementById('submitApplySpin').style.display = 'none';
 
-  if (submitError && window.sb) {
-    showApplyMsg('applyMsg3', window.jpT('err_submit'), 'error');
-    return;
-  }
+  if (!submitOk) return;
 
-  await new Promise(function(r) { setTimeout(r, 600); });
-
+  await new Promise(function(r) { setTimeout(r, 400); });
   for (var i = 1; i <= 4; i++) { var s = document.getElementById('applyStep'+i); if (s) s.style.display = 'none'; }
   document.getElementById('applySuccess').style.display = 'block';
 }

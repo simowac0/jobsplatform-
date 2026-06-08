@@ -1,0 +1,141 @@
+/* JobsPlatform — unique brand (trust + clarity + action) */
+
+:root {
+  --jp-navy:   #1a1f36;
+  --jp-navy2:  #252b48;
+  --jp-teal:   #0891b2;
+  --jp-teal-d: #0e7490;
+  --jp-teal-l: #ecfeff;
+  --jp-coral:  #e11d48;
+  --jp-coral-d:#be123c;
+  --jp-gold:   #d97706;
+  --jp-gold-l: #fffbeb;
+  --blue:      var(--jp-teal);
+  --blue-d:    var(--jp-teal-d);
+  --blue-l:    var(--jp-teal-l);
+  --accent:    var(--jp-coral);
+  --dark:      var(--jp-navy);
+  --muted:     #5b6478;
+  --border:    #e2e8f0;
+  --bg:        #f4f6fb;
+  --radius:    10px;
+  --shadow:    0 2px 12px rgba(26,31,54,0.08);
+}
+
+body { background: var(--bg); }
+
+/* Nav — dark trust bar */
+.navbar {
+  background: var(--jp-navy);
+  border-bottom: none;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+}
+.navbar::after {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, var(--jp-teal), var(--jp-coral), var(--jp-gold));
+}
+.navbar .logo-text, .navbar .logo-text strong { color: #fff !important; }
+.navbar .logo-icon { background: linear-gradient(135deg, var(--jp-teal), var(--jp-coral)) !important; }
+.nav-links a { color: rgba(255,255,255,0.88) !important; }
+.nav-links a:hover, .nav-links a.nav-active {
+  background: rgba(255,255,255,0.1) !important;
+  color: #fff !important;
+}
+.lang-btn { color: #fff; border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); }
+.lang-btn .lang-label { color: #fff; }
+.btn-ghost { color: #fff; border-color: rgba(255,255,255,0.35); }
+.btn-ghost:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: #fff; }
+.navbar .btn-primary { background: var(--jp-coral); }
+.navbar .btn-primary:hover { background: var(--jp-coral-d); }
+.hamburger { color: #fff; }
+
+/* Buttons */
+.btn-primary { background: linear-gradient(135deg, var(--jp-teal), var(--jp-teal-d)); border-radius: var(--radius); }
+.btn-primary:hover { background: var(--jp-teal-d); transform: translateY(-1px); }
+
+/* Hero — unique split feel */
+.hero {
+  background: linear-gradient(160deg, var(--jp-navy) 0%, var(--jp-navy2) 55%, #1e3a5f 100%);
+  color: #fff;
+  padding: 56px 0 48px;
+}
+.hero-content h1 { color: #fff; }
+.hero-content h1 .highlight {
+  background: linear-gradient(90deg, #67e8f9, #fda4af);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub { color: rgba(255,255,255,0.75); }
+.hero-badge { background: rgba(8,145,178,0.2); color: #67e8f9; border: 1px solid rgba(103,232,249,0.3); }
+.search-bar { background: #fff; border: none; box-shadow: 0 8px 32px rgba(0,0,0,0.2); border-radius: var(--radius); }
+.pillar { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #fff; }
+.pillar i { color: #67e8f9; }
+
+/* Jobs page hero */
+.jobs-hero {
+  background: linear-gradient(135deg, var(--jp-navy), var(--jp-navy2));
+  color: #fff;
+  border-bottom: none;
+  padding: 40px 0 36px;
+}
+.jobs-hero h1 { color: #fff; }
+.jobs-hero .highlight { color: #67e8f9; }
+.jobs-hero p { color: rgba(255,255,255,0.7); }
+.jobs-search { background: #fff; border: none; }
+.jobs-search input { color: var(--dark); }
+
+/* Job cards — JobsPlatform signature */
+.job-card {
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-left: 4px solid transparent;
+  box-shadow: var(--shadow);
+  transition: border-color .2s, box-shadow .2s, transform .15s;
+}
+.job-card:hover {
+  border-left-color: var(--jp-teal);
+  box-shadow: 0 8px 28px rgba(8,145,178,0.12);
+  transform: translateY(-2px);
+}
+.job-card.featured {
+  border-left-color: var(--jp-coral);
+  background: linear-gradient(135deg, #fff 0%, #fff5f7 100%);
+}
+.job-logo { border-radius: 12px !important; }
+.featured-badge { background: linear-gradient(135deg, var(--jp-coral), var(--jp-gold)) !important; }
+.verified-badge { color: var(--jp-teal) !important; }
+.job-tag.green { background: var(--jp-teal-l) !important; color: var(--jp-teal-d) !important; }
+
+/* Sidebar */
+.sidebar { border-radius: var(--radius); border: 1px solid var(--border); }
+.sidebar-section h4 { color: var(--jp-navy); border-bottom: 2px solid var(--jp-teal); padding-bottom: 8px; }
+.filter-check input { accent-color: var(--jp-teal); }
+
+/* Categories */
+.cat-card { border-radius: var(--radius); background: #fff; }
+.cat-card:hover { border-color: var(--jp-teal); }
+.cat-icon { background: var(--jp-teal-l) !important; color: var(--jp-teal) !important; }
+.cat-card:hover .cat-icon { background: var(--jp-teal) !important; color: #fff !important; }
+
+/* Footer */
+.footer { background: var(--jp-navy); }
+.footer::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, var(--jp-teal), var(--jp-coral));
+}
+.social-links a:hover { background: var(--jp-teal); }
+
+/* CTA */
+.cta-section { background: linear-gradient(135deg, var(--jp-navy), var(--jp-navy2)); }
+
+/* Apply / KYC */
+.btn-dark-pill { background: linear-gradient(135deg, var(--jp-navy), var(--jp-navy2)); border-radius: var(--radius); }
+.back-link { color: var(--jp-teal); font-weight: 600; }
+
+/* Page btn */
+.page-btn:hover, .page-btn.active { background: var(--jp-teal); border-color: var(--jp-teal); }
