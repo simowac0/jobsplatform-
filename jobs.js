@@ -17,8 +17,19 @@ function isNew(iso) { return (Date.now() - new Date(iso)) < 2*3600000; }
 
 // ─── STATE ───────────────────────────────────────────────────
 var JOBS_PER_PAGE = 10;
-var total         = window.TOTAL_AVAILABLE_JOBS || 40000;
+var engineTotal   = window.JOBS_ENGINE_TOTAL || window.TOTAL_AVAILABLE_JOBS || 800;
+var total         = window.BROWSE_JOB_COUNT || window.TOTAL_AVAILABLE_JOBS || 800;
 var currentPage   = 1;
+var filterTimer   = null;
+var _jobMemo      = {};
+
+function cachedGenerate(idx) {
+  if (_jobMemo[idx]) return _jobMemo[idx];
+  if (!window.generateJob) return null;
+  var j = window.generateJob(idx);
+  _jobMemo[idx] = j;
+  return j;
+}
 var activeFilters = {};         // holds current filter values
 var filteredIds   = null;       // null = no filter = show all by index desc
 var filteredList  = [];         // used when filters active
@@ -27,12 +38,28 @@ var syncTimer     = null;
 
 // ─── GET JOB BY INDEX (newest = index 0) ─────────────────────
 function getJobByRank(rank) {
-  // rank 0 = newest = highest idx
-  // live jobs come first
   if (rank < liveNewJobs.length) return liveNewJobs[rank];
-  var engineIdx = total - 1 - (rank - liveNewJobs.length);
+  var off = rank - liveNewJobs.length;
+  if (off >= total) return null;
+  var engineIdx = engineTotal - 1 - off;
   if (engineIdx < 0) return null;
-  return window.generateJob(engineIdx);
+  return cachedGenerate(engineIdx);
+}
+
+function getJobById(id) {
+  for (var i = 0; i < liveNewJobs.length; i++) {
+    if (liveNewJobs[i].id === id) return liveNewJobs[i];
+  }
+  var engineIdx = id - 10000;
+  if (engineIdx >= 0 && engineIdx < engineTotal) {
+    return cachedGenerate(engineIdx);
+  }
+  return null;
+}
+
+function scheduleFilter() {
+  clearTimeout(filterTimer);
+  filterTimer = setTimeout(filterJobs, 350);
 }
 
 // ─── FILTER ──────────────────────────────────────────────────
@@ -54,8 +81,8 @@ function filterJobs() {
     return;
   }
 
-  // Scan through jobs to build filtered list (sample up to 5000 for performance)
-  var SCAN = Math.min(total + liveNewJobs.length, 5000);
+  // Scan browsable jobs only (capped for speed)
+  var SCAN = total + liveNewJobs.length;
   filteredList = [];
   for (var r = 0; r < SCAN; r++) {
     var j = getJobByRank(r);
@@ -73,6 +100,7 @@ function filterJobs() {
     }
     if (resp !== 'any' && j.response > parseInt(resp)) continue;
     filteredList.push(j);
+    if (filteredList.length >= 120) break;
   }
 
   filteredIds = true; // flag: use filteredList
@@ -113,10 +141,13 @@ function renderPage(highlight) {
     }
   }
 
-  document.getElementById('jobsCount').innerHTML =
-    window.jpT('showing') + ' <strong>' + ((currentPage-1)*JOBS_PER_PAGE+1) + '–' +
-    Math.min(currentPage*JOBS_PER_PAGE, totalShown) +
-    '</strong> ' + window.jpT('of') + ' <strong>' + totalShown.toLocaleString() + '</strong> ' + window.jpT('jobs_word');
+  var countEl = document.getElementById('jobsCount');
+  if (countEl) {
+    countEl.innerHTML =
+      window.jpT('showing') + ' <strong>' + ((currentPage-1)*JOBS_PER_PAGE+1) + '–' +
+      Math.min(currentPage*JOBS_PER_PAGE, totalShown) +
+      '</strong> ' + window.jpT('of') + ' <strong>' + totalShown.toLocaleString() + '</strong> ' + window.jpT('jobs_word');
+  }
 
   if (!pageJobs.length) {
     list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--muted);"><i class="fa-solid fa-magnifying-glass" style="font-size:48px;opacity:.3;display:block;margin-bottom:16px;"></i><h3 style="margin-bottom:8px;">' + window.jpT('no_jobs') + '</h3><p>' + window.jpT('no_jobs_sub') + '</p><button class="btn-ghost" style="margin-top:16px;" onclick="resetFilters()">' + window.jpT('clear_filters') + '</button></div>';
@@ -161,18 +192,29 @@ function renderPage(highlight) {
   if (window.applyLang) applyLang(localStorage.getItem('jp_lang')||'en');
 }
 
-function renderPagination(pages, total) {
+function renderPagination(pages) {
   var el = document.getElementById('pagination');
   if (pages <= 1) { el.innerHTML=''; return; }
+  var MAX_BTNS = 7;
   var html = '';
   if (currentPage > 1) html += '<button class="page-btn" onclick="goPage('+(currentPage-1)+')">←</button>';
-  for (var i=1; i<=pages; i++) {
-    if (i===1||i===pages||Math.abs(i-currentPage)<=1) {
+
+  if (pages <= MAX_BTNS) {
+    for (var i = 1; i <= pages; i++) {
       html += '<button class="page-btn'+(i===currentPage?' active':'')+'" onclick="goPage('+i+')">'+i+'</button>';
-    } else if (Math.abs(i-currentPage)===2) {
-      html += '<span style="padding:0 4px;color:var(--muted);">…</span>';
     }
+  } else {
+    html += '<button class="page-btn'+(currentPage===1?' active':'')+'" onclick="goPage(1)">1</button>';
+    if (currentPage > 3) html += '<span style="padding:0 4px;color:var(--muted);">…</span>';
+    var start = Math.max(2, currentPage - 1);
+    var end   = Math.min(pages - 1, currentPage + 1);
+    for (var p = start; p <= end; p++) {
+      html += '<button class="page-btn'+(p===currentPage?' active':'')+'" onclick="goPage('+p+')">'+p+'</button>';
+    }
+    if (currentPage < pages - 2) html += '<span style="padding:0 4px;color:var(--muted);">…</span>';
+    html += '<button class="page-btn'+(currentPage===pages?' active':'')+'" onclick="goPage('+pages+')">'+pages+'</button>';
   }
+
   if (currentPage < pages) html += '<button class="page-btn" onclick="goPage('+(currentPage+1)+')">→</button>';
   el.innerHTML = html;
 }
@@ -209,8 +251,7 @@ function applyToJob(id) {
 }
 
 function showApplyModal(id) {
-  var job  = null;
-  for (var r=0; r<total+liveNewJobs.length; r++) { var j=getJobByRank(r); if(j&&j.id===id){job=j;break;} }
+  var job = getJobById(id);
   var user = JSON.parse(localStorage.getItem('jp_user') || '{}');
 
   var modal = document.getElementById('applyModal');
@@ -300,7 +341,7 @@ function injectLiveJobs(newJobs) {
       if (!j.desc)  j.desc  = j.title + ' at ' + j.company + '. Apply now.';
       liveNewJobs.unshift(j);
       ids.push(j.id);
-      total = window.TOTAL_AVAILABLE_JOBS = (window.TOTAL_AVAILABLE_JOBS||0) + 1;
+      engineTotal = window.JOBS_ENGINE_TOTAL = (window.JOBS_ENGINE_TOTAL||engineTotal) + 1;
     }
   });
   if (!ids.length) return;
@@ -318,18 +359,14 @@ function showSyncToast(n) {
 
 // ─── COUNTS ───────────────────────────────────────────────────
 function updateCounts() {
-  var counts = {};
-  // Sample 2000 jobs to estimate counts
-  var sample = Math.min(total, 2000);
-  for (var r=0; r<sample; r++) {
-    var j = getJobByRank(r);
-    if (!j) break;
-    counts[j.category] = (counts[j.category]||0)+1;
-    counts[j.type]     = (counts[j.type]    ||0)+1;
-  }
+  var weights = {
+    'Care':0.11,'Warehouse':0.14,'Customer Service':0.10,'Retail':0.12,'Admin':0.09,
+    'IT':0.08,'Cleaning':0.10,'Teaching':0.08,'Driving':0.09,'Construction':0.09
+  };
+  var base = engineTotal || total;
   ['Care','Warehouse','Customer Service','Retail','Admin','IT','Cleaning','Teaching','Driving','Construction'].forEach(function(cat){
     var el = document.getElementById('cnt-'+cat.replace(/\s+/g,'-'));
-    if (el && counts[cat]) el.textContent = (counts[cat] * Math.round(total/sample)).toLocaleString();
+    if (el) el.textContent = Math.round(base * (weights[cat] || 0.1)).toLocaleString();
   });
 }
 
@@ -339,8 +376,8 @@ if (searchForm) {
   searchForm.addEventListener('submit', function(e){e.preventDefault();filterJobs();});
   var sq = document.getElementById('searchQ');
   var sl = document.getElementById('searchLoc');
-  if (sq) sq.addEventListener('input', function(){filterJobs();});
-  if (sl) sl.addEventListener('input', function(){filterJobs();});
+  if (sq) sq.addEventListener('input', scheduleFilter);
+  if (sl) sl.addEventListener('input', scheduleFilter);
 }
 
 // ─── COMPANIES VIEW ───────────────────────────────────────────
@@ -414,7 +451,7 @@ window.onJpLangChange = function() {
 
 function updateJobsHeroSub() {
   var heroSub = document.querySelector('[data-t="jobs_sub"]');
-  if (heroSub) heroSub.textContent = (total).toLocaleString() + ' ' + window.jpT('listings_active');
+  if (heroSub) heroSub.textContent = (engineTotal).toLocaleString() + ' ' + window.jpT('listings_active');
 }
 
 if (window.jpRenderFilters) window.jpRenderFilters();
@@ -428,5 +465,5 @@ if (params.get('tab') !== 'companies') {
 }
 updateJobsHeroSub();
 
-// Start auto-sync
-setInterval(syncJobs, 30000);
+// Start auto-sync (every 60s — lighter on network)
+setInterval(syncJobs, 60000);

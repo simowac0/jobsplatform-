@@ -92,12 +92,13 @@
     'Dynamic fast-paced environment. Training and development fully funded.'
   ];
 
-  // ── Daily growth ──
-  var LAUNCH   = 1704067200000; // 2024-01-01
-  var BASE     = 40000;
-  var PER_DAY  = 500;
-  var days     = Math.max(0, Math.floor((Date.now() - LAUNCH) / 86400000));
-  var TOTAL    = Math.min(BASE + days * PER_DAY, 300000);
+  // ── Daily growth (marketing total) vs browse cap (performance) ──
+  var LAUNCH        = 1704067200000; // 2024-01-01
+  var BASE          = 40000;
+  var PER_DAY       = 500;
+  var BROWSE_CAP    = 800;  // max jobs loaded in UI — keeps site fast
+  var days          = Math.max(0, Math.floor((Date.now() - LAUNCH) / 86400000));
+  var ENGINE_TOTAL  = Math.min(BASE + days * PER_DAY, 50000);
 
   window.generateJob = function(idx) {
     var rng    = seeded((idx * 2654435761 + 98765) >>> 0);
@@ -120,17 +121,19 @@
     var featured= rng() < 0.04;
     var descIdx = Math.floor(rng() * DESCS.length);
     var desc    = DESCS[descIdx];
-    // idx=0 → oldest, idx=TOTAL-1 → newest
+    // idx=0 → oldest, idx=ENGINE_TOTAL-1 → newest
     var maxAgeMs = (days+1) * 86400000;
-    var ageMs    = Math.floor((1 - (idx+1)/TOTAL) * maxAgeMs);
+    var ageMs    = Math.floor((1 - (idx+1)/ENGINE_TOTAL) * maxAgeMs);
     var postedAt = new Date(Date.now() - ageMs).toISOString();
     return { id:idx+10000, title:title, company:company, logo:logo, color:pool.color, location:city, type:type, salaryMin:salMin, salary:salary, category:catKey, workMode:workMode, response:response, featured:featured, postedAt:postedAt, desc:desc, _titleIdx:titleIdx % 5, _descIdx:descIdx % 5 };
   };
 
-  window.TOTAL_AVAILABLE_JOBS = TOTAL;
+  window.JOBS_ENGINE_TOTAL    = ENGINE_TOTAL;
+  window.BROWSE_JOB_COUNT     = BROWSE_CAP;
+  window.TOTAL_AVAILABLE_JOBS = BROWSE_CAP;
   window.JOBS_PER_DAY_RATE    = PER_DAY;
   window.DAYS_SINCE_LAUNCH    = days;
-  window.JOBS_GENERATED       = null; // signal jobs.js to use generator
+  window.JOBS_GENERATED       = null;
 
-  console.log('📋 JobsPlatform: ' + TOTAL.toLocaleString() + ' jobs (day ' + days + ', +' + PER_DAY + '/day)');
+  console.log('📋 JobsPlatform: browsing ' + BROWSE_CAP + ' newest of ' + ENGINE_TOTAL.toLocaleString() + ' jobs');
 })();
