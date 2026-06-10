@@ -62,49 +62,109 @@ function scheduleFilter() {
   filterTimer = setTimeout(filterJobs, 350);
 }
 
+function jobMatchesQuery(j, q) {
+  if (!q) return true;
+  var ql = q.toLowerCase().trim();
+  var hay = (j.title + ' ' + j.company + ' ' + j.category + ' ' + j.location + ' ' + j.type + ' ' + j.workMode + ' ' + (j.desc || '')).toLowerCase();
+  if (ql === 'remote' && j.workMode.toLowerCase() === 'remote') return true;
+  if ((ql.indexOf('part') >= 0 || ql.indexOf('part-time') >= 0) && j.type.toLowerCase().indexOf('part') >= 0) return true;
+  if (ql.indexOf('no experience') >= 0 || ql.indexOf('no+experience') >= 0) {
+    return hay.indexOf('no previous experience') >= 0 || hay.indexOf('no degree') >= 0 || hay.indexOf('training provided') >= 0 || hay.indexOf('full training') >= 0;
+  }
+  if (hay.indexOf(ql) >= 0) return true;
+  var words = ql.split(/\s+/).filter(Boolean);
+  return words.length > 0 && words.every(function(w) { return hay.indexOf(w) >= 0; });
+}
+
+function jobMatchesSalary(j, sal) {
+  if (!sal || sal === 'any') return true;
+  var parts = sal.split('-').map(Number);
+  var lo = parts[0] * 1000;
+  var hi = parts[1] * 1000;
+  var annMin = j.salaryMin >= 100 ? j.salaryMin : j.salaryMin * 2080;
+  return annMin >= lo && annMin <= hi;
+}
+
+function runJobScan(criteria, limit) {
+  var list = [];
+  var SCAN = total + liveNewJobs.length;
+  for (var r = 0; r < SCAN; r++) {
+    var j = getJobByRank(r);
+    if (!j) break;
+    if (criteria.q && !jobMatchesQuery(j, criteria.q)) continue;
+    if (criteria.loc && j.location.toLowerCase().indexOf(criteria.loc) < 0) continue;
+    if (criteria.types.length && criteria.types.indexOf(j.type.toLowerCase()) < 0) continue;
+    if (criteria.cats.length && criteria.cats.indexOf(j.category.toLowerCase()) < 0) continue;
+    if (criteria.modes.length && criteria.modes.indexOf(j.workMode.toLowerCase()) < 0) continue;
+    if (!jobMatchesSalary(j, criteria.sal)) continue;
+    if (criteria.resp !== 'any' && j.response > parseInt(criteria.resp, 10)) continue;
+    list.push(j);
+    if (list.length >= (limit || 120)) break;
+  }
+  return list;
+}
+
+var searchRelaxed = false;
+
 // ─── FILTER ──────────────────────────────────────────────────
 function filterJobs() {
-  var q    = (document.getElementById('searchQ').value   || '').toLowerCase().trim();
-  var loc  = (document.getElementById('searchLoc').value || '').toLowerCase().trim();
-  var types = [...document.querySelectorAll('input[name="type"]:checked')].map(i=>i.value.toLowerCase());
-  var cats  = [...document.querySelectorAll('input[name="cat"]:checked') ].map(i=>i.value.toLowerCase());
-  var modes = [...document.querySelectorAll('input[name="loc"]:checked') ].map(i=>i.value.toLowerCase());
-  var sal   = document.querySelector('input[name="salary"]:checked')?.value || 'any';
-  var resp  = document.querySelector('input[name="resp"]:checked')?.value   || 'any';
+  var qEl = document.getElementById('searchQ');
+  var locEl = document.getElementById('searchLoc');
+  var catSel = document.getElementById('searchCat');
+  var salSel = document.getElementById('searchSal');
 
-  var noFilter = !q && !loc && !types.length && !cats.length && !modes.length && sal==='any' && resp==='any';
+  var q    = (qEl && qEl.value || '').toLowerCase().trim();
+  var loc  = (locEl && locEl.value || '').toLowerCase().trim();
+  var urlCat = catSel && catSel.value ? catSel.value.toLowerCase() : '';
+  var types = [...document.querySelectorAll('input[name="type"]:checked')].map(function(i) { return i.value.toLowerCase(); });
+  var cats  = [...document.querySelectorAll('input[name="cat"]:checked')].map(function(i) { return i.value.toLowerCase(); });
+  if (urlCat && cats.indexOf(urlCat) < 0) cats.push(urlCat);
+  var modes = [...document.querySelectorAll('input[name="loc"]:checked')].map(function(i) { return i.value.toLowerCase(); });
+  var salRadio = document.querySelector('input[name="salary"]:checked');
+  var sal   = (salSel && salSel.value) || (salRadio && salRadio.value) || 'any';
+  var resp  = (document.querySelector('input[name="resp"]:checked') || {}).value || 'any';
+
+  if (salSel && salSel.value && salSel.value !== 'any') {
+    var salRadio = document.querySelector('input[name="salary"][value="' + salSel.value + '"]');
+    if (salRadio) salRadio.checked = true;
+  }
+  if (urlCat) {
+    var catBox = document.querySelector('input[name="cat"][value="' + catSel.value + '"]');
+    if (catBox) catBox.checked = true;
+  }
+
+  var noFilter = !q && !loc && !types.length && !cats.length && !modes.length && sal === 'any' && resp === 'any';
   if (noFilter) {
     filteredIds  = null;
     filteredList = [];
+    searchRelaxed = false;
     currentPage  = 1;
     syncFilterButtons();
     renderPage();
     return;
   }
 
-  // Scan browsable jobs only (capped for speed)
-  var SCAN = total + liveNewJobs.length;
-  filteredList = [];
-  for (var r = 0; r < SCAN; r++) {
-    var j = getJobByRank(r);
-    if (!j) break;
-    if (q && !(j.title.toLowerCase().includes(q) || j.company.toLowerCase().includes(q) || j.category.toLowerCase().includes(q) || j.location.toLowerCase().includes(q))) continue;
-    if (loc   && !j.location.toLowerCase().includes(loc)) continue;
-    if (types.length && !types.includes(j.type.toLowerCase())) continue;
-    if (cats.length  && !cats.includes(j.category.toLowerCase())) continue;
-    if (modes.length && !modes.includes(j.workMode.toLowerCase())) continue;
-    if (sal !== 'any') {
-      var parts = sal.split('-').map(Number);
-      var lo = parts[0]*1000, hi = parts[1]*1000;
-      var annMin = j.salaryMin >= 100 ? j.salaryMin : j.salaryMin*2080;
-      if (annMin < lo || annMin > hi) continue;
+  var criteria = { q: q, loc: loc, types: types, cats: cats, modes: modes, sal: sal, resp: resp };
+  filteredList = runJobScan(criteria, 120);
+  searchRelaxed = false;
+
+  if (!filteredList.length) {
+    filteredList = runJobScan({ q: q, loc: loc, types: types, cats: cats, modes: modes, sal: 'any', resp: resp }, 120);
+    if (filteredList.length) searchRelaxed = true;
+  }
+  if (!filteredList.length) {
+    filteredList = runJobScan({ q: q, loc: '', types: types, cats: cats, modes: modes, sal: 'any', resp: 'any' }, 120);
+    if (filteredList.length) searchRelaxed = true;
+  }
+  if (!filteredList.length) {
+    for (var r = 0; r < Math.min(20, total); r++) {
+      var j = getJobByRank(r);
+      if (j) filteredList.push(j);
     }
-    if (resp !== 'any' && j.response > parseInt(resp)) continue;
-    filteredList.push(j);
-    if (filteredList.length >= 120) break;
+    searchRelaxed = true;
   }
 
-  filteredIds = true; // flag: use filteredList
+  filteredIds = true;
   currentPage = 1;
   syncFilterButtons();
   renderPage();
@@ -121,13 +181,20 @@ function syncFilterButtons() {
 }
 
 function resetFilters() {
-  document.getElementById('searchQ').value   = '';
-  document.getElementById('searchLoc').value = '';
+  var qEl = document.getElementById('searchQ');
+  var locEl = document.getElementById('searchLoc');
+  var catSel = document.getElementById('searchCat');
+  var salSel = document.getElementById('searchSal');
+  if (qEl) qEl.value = '';
+  if (locEl) locEl.value = '';
+  if (catSel) catSel.value = '';
+  if (salSel) salSel.value = 'any';
   document.querySelectorAll('input[name="type"], input[name="cat"], input[name="loc"]').forEach(i=>i.checked=false);
   document.querySelector('input[name="salary"][value="any"]').checked = true;
   document.querySelector('input[name="resp"][value="any"]').checked   = true;
   filteredIds  = null;
   filteredList = [];
+  searchRelaxed = false;
   currentPage  = 1;
   document.querySelectorAll('.filter-count-btn.active').forEach(function(b){ b.classList.remove('active'); });
   renderPage();
@@ -191,7 +258,12 @@ function renderPage(highlight) {
     return;
   }
 
-  list.innerHTML = pageJobs.map(function(raw) {
+  var relaxedBanner = '';
+  if (searchRelaxed && filteredIds) {
+    relaxedBanner = '<div class="search-relaxed-banner"><i class="fa-solid fa-wand-magic-sparkles"></i> ' + (window.jpT('search_relaxed') || 'Showing similar jobs — try adjusting filters for exact matches.') + '</div>';
+  }
+
+  list.innerHTML = relaxedBanner + pageJobs.map(function(raw) {
     var j = window.jpLocalizeJob ? window.jpLocalizeJob(raw) : raw;
     var hl = highlight.indexOf(j.id) >= 0;
     var saved = isJobSaved(j.id);
@@ -455,13 +527,21 @@ function showCompaniesView() {
 var params = new URLSearchParams(window.location.search);
 var searchQEl = document.getElementById('searchQ');
 var searchLocEl = document.getElementById('searchLoc');
-if (params.get('q') && searchQEl)        searchQEl.value   = params.get('q');
+var searchCatEl = document.getElementById('searchCat');
+var searchSalEl = document.getElementById('searchSal');
+if (params.get('q') && searchQEl) searchQEl.value = params.get('q');
 if (params.get('location') && searchLocEl) searchLocEl.value = params.get('location');
 if (params.get('category')) {
   var catVal = params.get('category');
+  if (searchCatEl) searchCatEl.value = catVal;
   var catInput = document.querySelector('input[name="cat"][value="'+catVal+'"]');
-  if (catInput) { catInput.checked = true; }
-  else if (searchQEl) { searchQEl.value = catVal; }
+  if (catInput) catInput.checked = true;
+  else if (searchQEl && !searchQEl.value) searchQEl.value = catVal;
+}
+if (params.get('salary') && searchSalEl) {
+  searchSalEl.value = params.get('salary');
+  var salInput = document.querySelector('input[name="salary"][value="'+params.get('salary')+'"]');
+  if (salInput) salInput.checked = true;
 }
 if (params.get('tab') === 'companies') { showCompaniesView(); }
 
@@ -525,7 +605,7 @@ function updateJobsHeroSub() {
 if (window.jpRenderFilters) window.jpRenderFilters();
 updateCounts();
 if (params.get('tab') !== 'companies') {
-  if (params.get('q') || params.get('category') || params.get('location') || document.querySelector('input[name="cat"]:checked')) {
+  if (params.get('q') || params.get('category') || params.get('location') || params.get('salary') || document.querySelector('input[name="cat"]:checked')) {
     filterJobs();
   } else {
     renderPage();

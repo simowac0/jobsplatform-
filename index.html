@@ -62,10 +62,32 @@
           <div class="pillar"><i class="fa-solid fa-magnifying-glass-chart"></i> <span data-ui="pillar_verified">Verified Listings</span></div>
         </div>
 
-        <form class="search-bar" action="jobs.html" method="GET">
-          <input type="text" name="q" data-t="search_ph1" placeholder="Job title, keywords..." />
-          <input type="text" name="location" data-t="search_ph2" placeholder="Location (e.g. London)" />
-          <button type="submit" class="btn-primary"><i class="fa-solid fa-magnifying-glass"></i> <span data-t="search_btn">Search Jobs</span></button>
+        <form class="search-bar search-bar-pro" action="jobs.html" method="GET" id="heroSearchForm">
+          <div class="search-bar-grid">
+            <input type="text" name="q" id="heroSearchQ" data-t="search_ph1" placeholder="Job title, keywords..." />
+            <select name="category" id="heroSearchCat" data-ui="search_cat_default">
+              <option value="" data-ui="search_cat_all">All categories</option>
+              <option value="Care">Care</option>
+              <option value="Warehouse">Warehouse</option>
+              <option value="Retail">Retail</option>
+              <option value="Admin">Admin</option>
+              <option value="Customer Service">Customer Service</option>
+              <option value="IT">IT</option>
+              <option value="Cleaning">Cleaning</option>
+              <option value="Teaching">Teaching</option>
+              <option value="Driving">Driving</option>
+              <option value="Construction">Construction</option>
+            </select>
+            <input type="text" name="location" id="heroSearchLoc" data-t="search_ph2" placeholder="Location (e.g. London)" />
+            <select name="salary" id="heroSearchSal">
+              <option value="any" data-ui="any_salary">Any salary</option>
+              <option value="0-20" data-ui="under_20k">Under £20k</option>
+              <option value="20-30" data-ui="sal_20_30">£20k – £30k</option>
+              <option value="30-50" data-ui="sal_30_50">£30k – £50k</option>
+              <option value="50-999" data-ui="sal_50_plus">£50k+</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary search-bar-submit"><i class="fa-solid fa-magnifying-glass"></i> <span data-t="search_btn">Search Jobs</span></button>
         </form>
 
         <div class="popular-searches">
@@ -80,10 +102,10 @@
 
         <div class="hero-stats">
           <div class="avatars">
-            <img class="avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face" alt="Job seeker" width="40" height="40" loading="lazy" />
-            <img class="avatar" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop&crop=face" alt="Job seeker" width="40" height="40" loading="lazy" />
-            <img class="avatar" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=80&h=80&fit=crop&crop=face" alt="Job seeker" width="40" height="40" loading="lazy" />
-            <img class="avatar" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&h=80&fit=crop&crop=face" alt="Job seeker" width="40" height="40" loading="lazy" />
+            <img class="avatar" src="https://images.unsplash.com/photo-1534528741775-539b194cbd22?w=80&h=80&fit=crop&crop=face" alt="Job seeker" width="40" height="40" loading="lazy" />
+            <img class="avatar" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&h=80&fit=crop&crop=face" alt="Job seeker" width="40" height="40" loading="lazy" />
+            <img class="avatar" src="https://images.unsplash.com/photo-1545167622-3ef25ffe04da?w=80&h=80&fit=crop&crop=face" alt="Job seeker" width="40" height="40" loading="lazy" />
+            <img class="avatar" src="https://images.unsplash.com/photo-1463453091225-20451c5d81f5?w=80&h=80&fit=crop&crop=face" alt="Job seeker" width="40" height="40" loading="lazy" />
           </div>
           <div class="stats-text" data-t="stats_text"><strong>2,400+</strong> people found jobs this month</div>
         </div>
@@ -230,7 +252,7 @@
           </div>
           <p class="testi-body" data-ui="testi1_text">"After months of no responses on other sites, I found a job here in two weeks. The salary transparency alone saved me so much time."</p>
           <div class="testimonial-author">
-            <img class="author-photo" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=96&h=96&fit=crop&crop=face" alt="Anna P." width="48" height="48" loading="lazy" />
+            <img class="author-photo" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&h=96&fit=crop&crop=face" alt="Anna P." width="48" height="48" loading="lazy" />
             <div><strong data-ui="testi1_name">Anna P.</strong><span data-ui="testi1_role">Now at Tesco</span></div>
           </div>
         </div>
@@ -242,7 +264,7 @@
           </div>
           <p class="testi-body" data-ui="testi2_text">"I was nervous about re-entering the job market after a gap. The no-experience filter and the quick responses made all the difference."</p>
           <div class="testimonial-author">
-            <img class="author-photo" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=96&h=96&fit=crop&crop=face" alt="James W." width="48" height="48" loading="lazy" />
+            <img class="author-photo" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=96&h=96&fit=crop&crop=face" alt="James W." width="48" height="48" loading="lazy" />
             <div><strong data-ui="testi2_name">James W.</strong><span data-ui="testi2_role">Now at Amazon</span></div>
           </div>
         </div>
@@ -254,7 +276,7 @@
           </div>
           <p class="testi-body" data-ui="testi3_text">"The verified listings are a game changer. No more applying to ghost jobs. Every application I sent got a real response."</p>
           <div class="testimonial-author">
-            <img class="author-photo" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=96&h=96&fit=crop&crop=face" alt="Sophie B." width="48" height="48" loading="lazy" />
+            <img class="author-photo" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=96&h=96&fit=crop&crop=face" alt="Sophie B." width="48" height="48" loading="lazy" />
             <div><strong data-ui="testi3_name">Sophie B.</strong><span data-ui="testi3_role">Now at NHS</span></div>
           </div>
         </div>

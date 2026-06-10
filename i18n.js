@@ -32,7 +32,8 @@ window.JP_UI = {
     replies_in: 'Replies in', live: 'Live', sort_label: 'Sort:',
     showing: 'Showing', of: 'of', jobs_word: 'jobs', no_jobs: 'No jobs found',
     no_jobs_sub: 'Try removing some filters.', clear_filters: 'Clear filters',
-    reset_filters: 'Reset all filters', filter_btn: 'Filters', filters_title: 'Filters',
+    reset_filters: 'Reset all filters',     filter_btn: 'Filters', filters_title: 'Filters',
+    search_cat_all: 'All categories', search_relaxed: 'Showing similar jobs — adjust filters for exact matches.',
     filter_job_type: 'Job Type', filter_salary: 'Salary Range',
     filter_category: 'Category', filter_location: 'Work Location', filter_response: 'Response Time',
     any_salary: 'Any salary', under_20k: 'Under £20k', sal_20_30: '£20k – £30k',
@@ -130,7 +131,8 @@ window.JP_UI = {
     replies_in: 'Réponse sous', live: 'En direct', sort_label: 'Trier :',
     showing: 'Affichage', of: 'sur', jobs_word: 'offres', no_jobs: 'Aucune offre trouvée',
     no_jobs_sub: 'Essayez de retirer des filtres.', clear_filters: 'Effacer les filtres',
-    reset_filters: 'Réinitialiser les filtres', filter_btn: 'Filtres', filters_title: 'Filtres',
+    reset_filters: 'Réinitialiser les filtres',     filter_btn: 'Filtres', filters_title: 'Filtres',
+    search_cat_all: 'Toutes catégories', search_relaxed: 'Offres similaires affichées — ajustez les filtres pour plus de précision.',
     filter_job_type: 'Type de contrat', filter_salary: 'Fourchette salariale',
     filter_category: 'Catégorie', filter_location: 'Lieu de travail', filter_response: 'Délai de réponse',
     any_salary: 'Tout salaire', under_20k: 'Moins de 20k£', sal_20_30: '20k£ – 30k£',
@@ -228,7 +230,8 @@ window.JP_UI = {
     replies_in: 'Antwort in', live: 'Live', sort_label: 'Sortieren:',
     showing: 'Anzeige', of: 'von', jobs_word: 'Jobs', no_jobs: 'Keine Jobs gefunden',
     no_jobs_sub: 'Versuchen Sie, Filter zu entfernen.', clear_filters: 'Filter löschen',
-    reset_filters: 'Alle Filter zurücksetzen', filter_btn: 'Filter', filters_title: 'Filter',
+    reset_filters: 'Alle Filter zurücksetzen',     filter_btn: 'Filter', filters_title: 'Filter',
+    search_cat_all: 'Alle Kategorien', search_relaxed: 'Ähnliche Jobs werden angezeigt — Filter für exakte Treffer anpassen.',
     filter_job_type: 'Beschäftigungsart', filter_salary: 'Gehaltsspanne',
     filter_category: 'Kategorie', filter_location: 'Arbeitsort', filter_response: 'Antwortzeit',
     any_salary: 'Beliebiges Gehalt', under_20k: 'Unter £20k', sal_20_30: '£20k – £30k',
@@ -326,7 +329,8 @@ window.JP_UI = {
     replies_in: 'Responde en', live: 'En vivo', sort_label: 'Ordenar:',
     showing: 'Mostrando', of: 'de', jobs_word: 'empleos', no_jobs: 'No se encontraron empleos',
     no_jobs_sub: 'Intenta quitar algunos filtros.', clear_filters: 'Borrar filtros',
-    reset_filters: 'Restablecer filtros', filter_btn: 'Filtros', filters_title: 'Filtros',
+    reset_filters: 'Restablecer filtros',     filter_btn: 'Filtros', filters_title: 'Filtros',
+    search_cat_all: 'Todas las categorías', search_relaxed: 'Mostrando empleos similares — ajusta los filtros para coincidencias exactas.',
     filter_job_type: 'Tipo de empleo', filter_salary: 'Rango salarial',
     filter_category: 'Categoría', filter_location: 'Ubicación', filter_response: 'Tiempo de respuesta',
     any_salary: 'Cualquier salario', under_20k: 'Menos de £20k', sal_20_30: '£20k – £30k',
@@ -736,6 +740,9 @@ window.jpApplyUI = function() {
   });
   document.querySelectorAll('[data-ui-ph]').forEach(function(el) {
     el.placeholder = window.jpT(el.getAttribute('data-ui-ph'));
+  });
+  document.querySelectorAll('select option[data-ui]').forEach(function(opt) {
+    opt.textContent = window.jpT(opt.getAttribute('data-ui'));
   });
   if (window.jpRenderCategories) window.jpRenderCategories();
   if (window.jpRenderFilters) window.jpRenderFilters();

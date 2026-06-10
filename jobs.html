@@ -51,10 +51,32 @@
     <div class="container">
       <h1 data-t="jobs_h1">Browse <span class="highlight">Verified</span> Jobs</h1>
       <p data-t="jobs_sub">Active listings · All salaries shown · Employers respond within 48h</p>
-      <form class="search-bar jobs-search" id="searchForm">
-        <input type="text" id="searchQ" data-t="search_ph1" placeholder="Job title, keywords..." />
-        <input type="text" id="searchLoc" data-t="search_ph2" placeholder="Location (e.g. London)" />
-        <button type="submit" class="btn-primary"><i class="fa-solid fa-magnifying-glass"></i> <span data-t="search_btn">Search</span></button>
+      <form class="search-bar search-bar-pro jobs-search" id="searchForm">
+        <div class="search-bar-grid">
+          <input type="text" id="searchQ" name="q" data-t="search_ph1" placeholder="Job title, keywords..." />
+          <select id="searchCat" name="category" data-ui="search_cat_default">
+            <option value="" data-ui="search_cat_all">All categories</option>
+            <option value="Care">Care</option>
+            <option value="Warehouse">Warehouse</option>
+            <option value="Retail">Retail</option>
+            <option value="Admin">Admin</option>
+            <option value="Customer Service">Customer Service</option>
+            <option value="IT">IT</option>
+            <option value="Cleaning">Cleaning</option>
+            <option value="Teaching">Teaching</option>
+            <option value="Driving">Driving</option>
+            <option value="Construction">Construction</option>
+          </select>
+          <input type="text" id="searchLoc" name="location" data-t="search_ph2" placeholder="Location (e.g. London)" />
+          <select id="searchSal" name="salary">
+            <option value="any" data-ui="any_salary">Any salary</option>
+            <option value="0-20" data-ui="under_20k">Under £20k</option>
+            <option value="20-30" data-ui="sal_20_30">£20k – £30k</option>
+            <option value="30-50" data-ui="sal_30_50">£30k – £50k</option>
+            <option value="50-999" data-ui="sal_50_plus">£50k+</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary search-bar-submit"><i class="fa-solid fa-magnifying-glass"></i> <span data-t="search_btn">Search</span></button>
       </form>
     </div>
   </section>
