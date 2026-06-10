@@ -321,9 +321,87 @@ body { background: #fdf8f3; }
   .sticky-salary { display: none; }
 }
 
+/* Mobile fixed bottom dock */
+.jd-mobile-dock { display: none; }
+
 @media (max-width: 900px) {
   .jd-layout { grid-template-columns: 1fr; }
-  .jd-sidebar { order: -1; }
+  .jd-sidebar { display: none !important; }
+
+  #jobDetailView .jd-container {
+    padding-bottom: calc(210px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .jd-mobile-dock {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 500;
+    background: #fff;
+    border-top: 1px solid #e2ddd6;
+    box-shadow: 0 -6px 28px rgba(26, 31, 54, 0.14);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .jd-mobile-dock-apply {
+    background: #fff;
+    border: 2px solid #1a2035;
+    border-radius: 14px;
+    padding: 14px 16px 10px;
+    margin-bottom: 10px;
+  }
+
+  .jd-mobile-apply-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 20px;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .jd-mobile-dock-apply p {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .jd-mobile-dock-help {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #fefce8;
+    border: 1px solid #fef08a;
+    border-radius: 12px;
+    padding: 10px 12px;
+  }
+
+  .jd-mobile-dock-help > i {
+    color: #ca8a04;
+    font-size: 18px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .jd-mobile-dock-help strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a2035;
+    margin-bottom: 2px;
+  }
+
+  .jd-mobile-dock-help span {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  .sticky-apply-bar { display: none !important; }
+
   .jd-contract-grid { grid-template-columns: 1fr; }
   .jd-benefits-grid { grid-template-columns: 1fr; }
 }

@@ -497,18 +497,20 @@ function renderJob(raw) {
   document.getElementById('stickyCompany').textContent = j.company;
   document.getElementById('stickySalary').textContent  = j.salary;
 
-  // Show sticky bar after scrolling past the main Apply button
-  var applyCard = document.querySelector('.jd-apply-card');
-  var stickyBar = document.getElementById('stickyApplyBar');
-  window.addEventListener('scroll', function() {
-    if (!applyCard || !stickyBar) return;
-    var rect = applyCard.getBoundingClientRect();
-    if (rect.bottom < 0) {
-      stickyBar.classList.add('visible');
-    } else {
-      stickyBar.classList.remove('visible');
-    }
-  }, { passive: true });
+  // Desktop: sticky bar after scrolling past apply card
+  if (!window._stickyScrollInit) {
+    window._stickyScrollInit = true;
+    window.addEventListener('scroll', function() {
+      if (window.innerWidth <= 900) return;
+      var applyCard = document.querySelector('.jd-apply-card');
+      var stickyBar = document.getElementById('stickyApplyBar');
+      if (!applyCard || !stickyBar) return;
+      var rect = applyCard.getBoundingClientRect();
+      stickyBar.classList.toggle('visible', rect.bottom < 0);
+    }, { passive: true });
+  }
+
+  setMobileDockVisible(document.getElementById('jobDetailView').style.display !== 'none');
 }
 
 function populateApplySidebar(j) {
@@ -538,15 +540,27 @@ function startApply() {
   showApplyView();
 }
 
+function setMobileDockVisible(show) {
+  var dock = document.getElementById('jdMobileDock');
+  if (!dock) return;
+  if (show && window.innerWidth <= 900) {
+    dock.style.display = 'block';
+  } else {
+    dock.style.display = 'none';
+  }
+}
+
 function showDetailView() {
   document.getElementById('jobDetailView').style.display  = 'block';
   document.getElementById('applyFormView').style.display  = 'none';
+  setMobileDockVisible(true);
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
 function showApplyView() {
   document.getElementById('jobDetailView').style.display  = 'none';
   document.getElementById('applyFormView').style.display  = 'block';
+  setMobileDockVisible(false);
   applyGoStep(1);
   window.scrollTo({top:0, behavior:'smooth'});
 }
@@ -1165,6 +1179,12 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   renderJob(currentJob);
+  setMobileDockVisible(true);
+  window.addEventListener('resize', function() {
+    if (document.getElementById('applyFormView').style.display === 'none') {
+      setMobileDockVisible(true);
+    }
+  });
 
   window.onJpLangChange = function() {
     if (currentJob) renderJob(currentJob);

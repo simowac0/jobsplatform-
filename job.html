@@ -536,7 +536,24 @@
 
   </main>
 
-  <!-- Sticky Apply Bar -->
+  <!-- Mobile fixed dock: Apply + Need help -->
+  <div class="jd-mobile-dock" id="jdMobileDock">
+    <div class="jd-mobile-dock-apply">
+      <button type="button" class="btn-dark-pill jd-mobile-apply-btn" onclick="startApply()">
+        <i class="fa-solid fa-paper-plane"></i> <span data-ui="apply_now">Apply now</span>
+      </button>
+      <p data-ui="quick_apply_sub">Quick application – 5 minutes maximum</p>
+    </div>
+    <div class="jd-mobile-dock-help">
+      <i class="fa-solid fa-headset"></i>
+      <div>
+        <strong data-ui="need_help">Need help?</strong>
+        <span data-ui="need_help_sub">Our team is available to assist you with your application.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Apply Bar (desktop scroll) -->
   <div class="sticky-apply-bar" id="stickyApplyBar">
     <div class="sticky-apply-inner">
       <div class="sticky-job-info">
