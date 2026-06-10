@@ -481,19 +481,12 @@ img { max-width: 100%; }
   height: 40px;
   border-radius: 50%;
   border: 3px solid #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-  color: #fff;
+  object-fit: cover;
+  flex-shrink: 0;
   margin-left: -10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 .avatar:first-child { margin-left: 0; }
-.av1 { background: #2563eb; }
-.av2 { background: #16a34a; }
-.av3 { background: #7c3aed; }
-.av4 { background: #ea580c; }
 
 .stats-text { font-size: 14px; color: var(--muted); }
 .stats-text strong { color: var(--dark); }
