@@ -183,19 +183,123 @@ body {
   font-size: 13px;
 }
 
+/* We Eliminate — premium contrast block */
 .eliminates {
-  background: var(--jp-navy);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0f1428 0%, var(--jp-navy) 45%, #1a2744 100%);
   color: #fff;
-  border-radius: 16px;
-  padding: 36px 40px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 0;
+  border: 1px solid rgba(103, 232, 249, 0.15);
+  box-shadow: 0 20px 50px rgba(15, 20, 40, 0.35);
 }
-.eliminates h3 { color: #67e8f9; margin-bottom: 20px; }
-.elim-list span {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
+.eliminates::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(225, 29, 72, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.eliminates::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: -40px;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(8, 145, 178, 0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+.elim-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 40px;
+  align-items: center;
+  padding: 44px 48px;
+}
+.elim-intro { max-width: 320px; }
+.elim-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(8, 145, 178, 0.15);
+  border: 1px solid rgba(103, 232, 249, 0.35);
+  color: #67e8f9;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
   border-radius: 100px;
-  padding: 8px 16px;
+  margin-bottom: 16px;
+}
+.eliminates h3 {
+  font-size: clamp(26px, 3.5vw, 34px);
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+.eliminates h3::after { display: none; }
+.elim-desc {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.6;
+  margin: 0;
+}
+.elim-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.elim-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px 18px;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.elim-item:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(225, 29, 72, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+.elim-x {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.25), rgba(190, 18, 60, 0.15));
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  border-radius: 10px;
+  color: #fda4af;
+  font-size: 14px;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.elim-item:hover .elim-x {
+  background: linear-gradient(135deg, var(--jp-coral), var(--jp-coral-d));
+  color: #fff;
+  transform: rotate(-8deg) scale(1.05);
+}
+.elim-item span {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.35;
+  position: relative;
+}
+.elim-item:hover span {
+  color: #fff;
+  text-decoration: line-through;
+  text-decoration-color: rgba(253, 164, 175, 0.7);
 }
 
 /* Categories */
@@ -361,9 +465,11 @@ body {
 
   .jp-section, .features, .categories, .how-it-works, .testimonials { padding: 48px 0; }
   .section-header { margin-bottom: 32px; }
-  .eliminates { padding: 28px 20px; border-radius: 12px; }
-  .elim-list { gap: 8px; }
-  .elim-list span { font-size: 13px; }
+  .elim-inner { grid-template-columns: 1fr; gap: 28px; padding: 28px 20px; }
+  .elim-intro { max-width: none; text-align: center; }
+  .elim-badge { margin-bottom: 12px; }
+  .elim-grid { grid-template-columns: 1fr; gap: 10px; }
+  .elim-item { padding: 14px 16px; }
 
   .nav-right .btn-ghost {
     background: rgba(255,255,255,0.12) !important;
