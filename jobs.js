@@ -225,7 +225,6 @@ function renderPage(highlight) {
   }).join('');
 
   renderPagination(pages, totalShown);
-  if (window.applyLang) applyLang(localStorage.getItem('jp_lang')||'en');
 }
 
 function renderPagination(pages) {
@@ -485,12 +484,38 @@ window.addEventListener('DOMContentLoaded', function() {
 
 // ─── INIT ─────────────────────────────────────────────────────
 window.onJpLangChange = function() {
-  if (params.get('tab') === 'companies') showCompaniesView();
-  else renderPage();
+  if (params.get('tab') === 'companies') {
+    showCompaniesView();
+  } else {
+    if (window.jpRenderFilters) window.jpRenderFilters();
+    renderPage();
+  }
   updateJobsHeroSub();
   var sortLbl = document.querySelector('.jobs-sort label');
   if (sortLbl) sortLbl.textContent = window.jpT('sort_label');
+  var sel = document.getElementById('sortSelect');
+  if (sel) {
+    if (sel.options[0]) sel.options[0].text = window.jpT('sort_recent') || sel.options[0].text;
+    if (sel.options[1]) sel.options[1].text = window.jpT('sort_salary') || sel.options[1].text;
+    if (sel.options[2]) sel.options[2].text = window.jpT('sort_resp') || sel.options[2].text;
+  }
 };
+
+function toggleMobileFilters() {
+  var wrap = document.getElementById('sidebarWrap');
+  var bd   = document.getElementById('filterBackdrop');
+  if (wrap) wrap.classList.add('mobile-open');
+  if (bd) bd.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileFilters() {
+  var wrap = document.getElementById('sidebarWrap');
+  var bd   = document.getElementById('filterBackdrop');
+  if (wrap) wrap.classList.remove('mobile-open');
+  if (bd) bd.classList.remove('open');
+  document.body.style.overflow = '';
+}
 
 function updateJobsHeroSub() {
   var heroSub = document.querySelector('[data-t="jobs_sub"]');

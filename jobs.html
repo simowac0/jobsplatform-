@@ -60,14 +60,24 @@
   </section>
 
   <section class="jobs-layout">
+    <div class="filter-backdrop" id="filterBackdrop" onclick="closeMobileFilters()"></div>
     <div class="container jobs-container">
 
-      <!-- SIDEBAR -->
-      <aside class="sidebar" id="filtersSidebar"></aside>
+      <!-- SIDEBAR (hidden on mobile until Filters tapped) -->
+      <aside class="sidebar" id="sidebarWrap">
+        <div class="filter-mobile-header">
+          <span data-ui="filters_title">Filters</span>
+          <button type="button" class="filter-close" onclick="closeMobileFilters()" aria-label="Close filters"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="filtersSidebar"></div>
+      </aside>
 
       <!-- JOB LISTINGS -->
       <main class="jobs-main">
         <div class="jobs-toolbar">
+          <button type="button" class="btn-filter-toggle" id="filterToggle" onclick="toggleMobileFilters()">
+            <i class="fa-solid fa-sliders"></i> <span data-ui="filter_btn">Filters</span>
+          </button>
           <div class="jobs-count" id="jobsCount" data-ui="loading_jobs">Loading jobs...</div>
           <div class="jobs-sort">
             <label data-ui="sort_label">Sort:</label>
