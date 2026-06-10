@@ -77,6 +77,7 @@ function filterJobs() {
     filteredIds  = null;
     filteredList = [];
     currentPage  = 1;
+    syncFilterButtons();
     renderPage();
     return;
   }
@@ -105,7 +106,18 @@ function filterJobs() {
 
   filteredIds = true; // flag: use filteredList
   currentPage = 1;
+  syncFilterButtons();
   renderPage();
+}
+
+function syncFilterButtons() {
+  document.querySelectorAll('.filter-count-btn').forEach(function(btn) {
+    var group = btn.getAttribute('data-group');
+    var val   = btn.getAttribute('data-value');
+    if (!group || !val) return;
+    var inp = document.querySelector('input[name="' + group + '"][value="' + val + '"]');
+    btn.classList.toggle('active', !!(inp && inp.checked));
+  });
 }
 
 function resetFilters() {
@@ -117,7 +129,31 @@ function resetFilters() {
   filteredIds  = null;
   filteredList = [];
   currentPage  = 1;
+  document.querySelectorAll('.filter-count-btn.active').forEach(function(b){ b.classList.remove('active'); });
   renderPage();
+}
+
+function applyFilterOnly(group, value) {
+  if (group === 'type' || group === 'cat' || group === 'loc') {
+    var inputs = document.querySelectorAll('input[name="' + group + '"]');
+    var onlyThis = true;
+    inputs.forEach(function(inp) {
+      if (inp.value !== value && inp.checked) onlyThis = false;
+    });
+    var target = document.querySelector('input[name="' + group + '"][value="' + value + '"]');
+    if (onlyThis && target && target.checked) {
+      target.checked = false;
+    } else {
+      inputs.forEach(function(inp) { inp.checked = (inp.value === value); });
+    }
+  }
+  document.querySelectorAll('.filter-count-btn').forEach(function(b){ b.classList.remove('active'); });
+  var btn = document.getElementById('cnt-' + value.replace(/\s+/g, '-'));
+  if (btn) {
+    var inp = document.querySelector('input[name="' + group + '"][value="' + value + '"]');
+    if (inp && inp.checked) btn.classList.add('active');
+  }
+  filterJobs();
 }
 
 // ─── RENDER ──────────────────────────────────────────────────
@@ -359,14 +395,21 @@ function showSyncToast(n) {
 
 // ─── COUNTS ───────────────────────────────────────────────────
 function updateCounts() {
-  var weights = {
+  var catWeights = {
     'Care':0.11,'Warehouse':0.14,'Customer Service':0.10,'Retail':0.12,'Admin':0.09,
     'IT':0.08,'Cleaning':0.10,'Teaching':0.08,'Driving':0.09,'Construction':0.09
   };
+  var typeWeights = {
+    'Full-time':0.55,'Part-time':0.20,'Temporary':0.08,'Contract':0.10,'Zero Hours':0.07
+  };
   var base = engineTotal || total;
-  ['Care','Warehouse','Customer Service','Retail','Admin','IT','Cleaning','Teaching','Driving','Construction'].forEach(function(cat){
-    var el = document.getElementById('cnt-'+cat.replace(/\s+/g,'-'));
-    if (el) el.textContent = Math.round(base * (weights[cat] || 0.1)).toLocaleString();
+  Object.keys(catWeights).forEach(function(cat) {
+    var el = document.getElementById('cnt-' + cat.replace(/\s+/g, '-'));
+    if (el) el.textContent = Math.round(base * catWeights[cat]).toLocaleString();
+  });
+  Object.keys(typeWeights).forEach(function(t) {
+    var el = document.getElementById('cnt-' + t.replace(/\s+/g, '-'));
+    if (el) el.textContent = Math.round(base * typeWeights[t]).toLocaleString();
   });
 }
 

@@ -673,7 +673,9 @@ window.jpRenderFilters = function() {
       var checked = document.querySelector('input[name="type"][value="'+t+'"]');
       var isOn = checked && checked.checked;
       return '<label class="filter-check"><input type="checkbox" name="type" value="'+t+'" onchange="filterJobs()"'+(isOn?' checked':'')+' /> ' +
-        window.jpMeta(t,'type') + ' <span class="filter-count" id="'+id+'">—</span></label>';
+        '<span class="filter-label">' + window.jpMeta(t,'type') + '</span>' +
+        '<button type="button" class="filter-count-btn'+(isOn?' active':'')+'" id="'+id+'" data-group="type" data-value="'+t+'" onclick="event.preventDefault();event.stopPropagation();applyFilterOnly(\'type\',\''+t+'\')" title="'+window.jpMeta(t,'type')+'">' +
+        '0</button></label>';
     }).join('') + '</div>' +
     '<div class="sidebar-section"><h4>' + window.jpT('filter_salary') + '</h4>' +
     [['any','any_salary'],['0-20','under_20k'],['20-30','sal_20_30'],['30-50','sal_30_50'],['50-999','sal_50_plus']].map(function(pair) {
@@ -688,7 +690,9 @@ window.jpRenderFilters = function() {
       var isOn = checked && checked.checked;
       var lbl = c === 'IT' ? window.jpT('cat_it_tech') : window.jpMeta(c,'category');
       return '<label class="filter-check"><input type="checkbox" name="cat" value="'+c+'" onchange="filterJobs()"'+(isOn?' checked':'')+' /> ' +
-        lbl + ' <span class="filter-count" id="'+id+'">—</span></label>';
+        '<span class="filter-label">' + lbl + '</span>' +
+        '<button type="button" class="filter-count-btn'+(isOn?' active':'')+'" id="'+id+'" data-group="cat" data-value="'+c+'" onclick="event.preventDefault();event.stopPropagation();applyFilterOnly(\'cat\',\''+c+'\')" title="'+lbl+'">' +
+        '0</button></label>';
     }).join('') + '</div>' +
     '<div class="sidebar-section"><h4>' + window.jpT('filter_location') + '</h4>' +
     locs.map(function(l) {
